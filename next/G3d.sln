@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G3d", "G3d\G3d.csproj", "{6A19E89F-751D-4923-9664-FAA0DD1845F5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G3d.CodeGen", "G3d.CodeGen\G3d.CodeGen.csproj", "{343C2251-DBD1-4AD4-9EF3-37BA095287A3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3D582220-F95B-4F97-B754-17F1403DC8D0}"
+	ProjectSection(SolutionItems) = preProject
+		TODO.md = TODO.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6A19E89F-751D-4923-9664-FAA0DD1845F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A19E89F-751D-4923-9664-FAA0DD1845F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A19E89F-751D-4923-9664-FAA0DD1845F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A19E89F-751D-4923-9664-FAA0DD1845F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{343C2251-DBD1-4AD4-9EF3-37BA095287A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{343C2251-DBD1-4AD4-9EF3-37BA095287A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{343C2251-DBD1-4AD4-9EF3-37BA095287A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{343C2251-DBD1-4AD4-9EF3-37BA095287A3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E755F61A-CED5-4CE8-8729-FE5C4A2D8EDE}
+	EndGlobalSection
+EndGlobal
