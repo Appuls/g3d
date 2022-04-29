@@ -2,7 +2,15 @@
 
 ## Current Actions
 
+- Preparing source generation for Attribute descriptors
+  - Moving G3d.AttributeDescriptor concept into its own project
+
 - Follow source generation @ https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview
+
+## Cleanup
+
+- Consolidate enum values to make them look normal
+- Add unsigned DataTypes
 
 ## Ideas
 

@@ -12,4 +12,8 @@
         </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\G3d.Attributes\G3d.AttributeDescriptor.csproj" />
+    </ItemGroup>
+
 </Project>

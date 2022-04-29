@@ -1,10 +1,15 @@
 using Microsoft.CodeAnalysis;
 
-namespace SourceGenerator
+namespace G3d.CodeGen
 {
     [Generator]
     public class G3dSourceGenerator : ISourceGenerator
     {
+        public void Initialize(GeneratorInitializationContext context)
+        {
+            
+        }
+
         public void Execute(GeneratorExecutionContext context)
         {
             // Find the main method
@@ -27,11 +32,6 @@ namespace {mainMethod.ContainingNamespace.ToDisplayString()}
 
             // Add the source code to the compilation
             context.AddSource($"{typeName}.g.cs", source);
-        }
-
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            // No initialization required for this one
         }
     }
 }
