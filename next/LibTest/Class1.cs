@@ -1,4 +1,6 @@
-﻿namespace Vim.G3d;
+﻿using G3d.Attributes;
+
+namespace Vim.G3d;
 
 //public const string ObjectFaceSize = "g3d:all:facesize:0:int32:1";
 //public const string Index = "g3d:corner:index:0:int32:1";
@@ -30,8 +32,8 @@
 //public const string SubmeshIndexOffset = "g3d:submesh:indexoffset:0:int32:1";
 //public const string SubmeshMaterial = "g3d:submesh:material:0:int32:1";
 
-[]
-public class Class1
+[AttributeDescriptor("g3d:vertex:position:0:float32:3")]
+public class VertexBuffer
 {
 
 }

@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace G3d.AttributeDescriptor
+﻿namespace G3d.Core
 {
+    // TODO: MOVE THIS TO STRINGS
     public enum Association
     {
         /// <summary>

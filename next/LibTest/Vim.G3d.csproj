@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\G3d.Attributes\G3d.AttributeDescriptor.csproj" />
+    <ProjectReference Include="..\G3d.Attributes\G3d.Core.csproj" />
     <ProjectReference Include="..\G3d.CodeGen\G3d.CodeGen.csproj" />
     <ProjectReference Include="..\G3d\G3d.csproj" />
   </ItemGroup>

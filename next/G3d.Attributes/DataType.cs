@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace G3d.AttributeDescriptor
+namespace G3d.Core
 {
     public enum DataType
     {
