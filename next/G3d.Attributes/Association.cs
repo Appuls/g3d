@@ -4,6 +4,11 @@ namespace G3d.AttributeDescriptor
 {
     public enum Association
     {
+        /// <summary>
+        /// Exists to support future values which are currently unknown.
+        /// </summary>
+        unknown,  
+
         // IMPORTANT: the string values of these associations, including their capitalization,
         // are used in the parsing mechanism of the AttributeDescriptor, so be careful!
         all,      // associated with all data in G3d
@@ -18,16 +23,5 @@ namespace G3d.AttributeDescriptor
         material, // material properties
         mesh,     // mesh association (a mesh contains submeshes which correspond to slices of materials)
         submesh,  // submesh association (a submesh has indices, vertices, and a material)
-    }
-
-    public static class AssociationExtensions
-    {
-        /// <summary>
-        /// Parses the given string and attempts to return the corresponding association.
-        /// </summary>
-        public static Association ParseAssociation(this string str, Association @default = Association.none)
-            => Enum.TryParse(str, out Association association)
-                ? association
-                : @default;
     }
 }

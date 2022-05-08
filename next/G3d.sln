@@ -12,9 +12,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TODO.md = TODO.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vim.G3d", "LibTest\Vim.G3d.csproj", "{BC62251E-E36E-473A-BCA7-E032E085E36C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vim.G3d", "LibTest\Vim.G3d.csproj", "{BC62251E-E36E-473A-BCA7-E032E085E36C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G3d.AttributeDescriptor", "G3d.Attributes\G3d.AttributeDescriptor.csproj", "{8F55ACE2-290C-4237-B79C-3EB3FCA3DAF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G3d.AttributeDescriptor", "G3d.Attributes\G3d.AttributeDescriptor.csproj", "{8F55ACE2-290C-4237-B79C-3EB3FCA3DAF4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OLD", "OLD", "{FEAB1152-657E-4BEB-AB54-322763CDDF25}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vim.G3d", "..\csharp\Vim.G3d\Vim.G3d.csproj", "{B0AA7814-0781-4F4E-A849-DA207AEBDCBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,9 +42,16 @@ Global
 		{8F55ACE2-290C-4237-B79C-3EB3FCA3DAF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F55ACE2-290C-4237-B79C-3EB3FCA3DAF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F55ACE2-290C-4237-B79C-3EB3FCA3DAF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0AA7814-0781-4F4E-A849-DA207AEBDCBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0AA7814-0781-4F4E-A849-DA207AEBDCBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0AA7814-0781-4F4E-A849-DA207AEBDCBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0AA7814-0781-4F4E-A849-DA207AEBDCBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B0AA7814-0781-4F4E-A849-DA207AEBDCBA} = {FEAB1152-657E-4BEB-AB54-322763CDDF25}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E755F61A-CED5-4CE8-8729-FE5C4A2D8EDE}

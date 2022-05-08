@@ -17,7 +17,9 @@ namespace G3d.AttributeDescriptor
         ///     "g3d" is the standard prefix.
         /// </code>
         /// </summary>
-        public readonly string Name;
+        private string _name;
+        public string Name
+            => _name ?? (_name = $"{G3dPrefix}:{AssociationStr}:{Semantic}:{IndexStr}:{DataTypeStr}:{DataArityStr}");
 
         /// <summary>
         /// The second token in the AttributeDescriptor; designates the object to
@@ -28,6 +30,7 @@ namespace G3d.AttributeDescriptor
         /// </code>
         /// </summary>
         public readonly Association Association;
+        public readonly string AssociationStr;
 
         /// <summary>
         /// The third token in the AttributeDescriptor; designates the semantic meaning of the data.
@@ -47,6 +50,7 @@ namespace G3d.AttributeDescriptor
         /// </code>
         /// </summary>
         public readonly int Index;
+        public readonly string IndexStr;
 
         /// <summary>
         /// The fifth token in the AttributeDescriptor; designates the data type which composes the buffer.
@@ -58,6 +62,7 @@ namespace G3d.AttributeDescriptor
         /// </code>
         /// </summary>
         public readonly DataType DataType;
+        public readonly string DataTypeStr;
 
         /// <summary>
         /// The sixth token in the AttributeDescriptor; designates arity, or the number of values which compose
@@ -70,6 +75,7 @@ namespace G3d.AttributeDescriptor
         /// </code>
         /// </summary>
         public readonly int DataArity;
+        public readonly string DataArityStr;
 
         /// <summary>
         /// Constructor.
@@ -90,17 +96,126 @@ namespace G3d.AttributeDescriptor
             DataType dataType,
             int dataArity)
         {
-            Association = association;
+            if (association == Association.unknown)
+                throw new ArgumentException($"The association cannot be '{Association.unknown}'.");
+
+            if (dataType == DataType.unknown)
+                throw new ArgumentException($"The data type cannot be '{DataType.unknown}'.");
+
+            if (string.IsNullOrWhiteSpace(semantic))
+                throw new ArgumentException($"The semantic cannot be null or whitespace.");
+
             if (semantic.Contains(Separator))
-                throw new Exception($"The semantic must not contain a '{Separator}' character");
+                throw new ArgumentException($"The semantic must not contain a '{Separator}' character");
+
+            Association = association;
+            AssociationStr = Association.ToString("G");
+
             Semantic = semantic;
-            DataType = dataType;
-            DataArity = dataArity;
+
             Index = index;
-            DataTypeSize = DataType.GetDataTypeSize();
-            DataElementSize = DataTypeSize * DataArity;
-            Name = $"{G3dPrefix}:{Association:G}:{Semantic}:{Index}:{DataType:G}:{DataArity}";
+            IndexStr = Index.ToString();
+
+            DataType = dataType;
+            DataTypeStr = DataType.ToString("G");
+
+            DataArity = dataArity;
+            DataArityStr = DataArity.ToString();
+
+            (DataTypeSize, DataElementSize) = GetDataSizes(DataType, DataArity);
         }
+
+        /// <summary>
+        /// Constructor. Parses an input string of the form: "g3d:instance:transform:0:float32:16".
+        /// </summary>
+        public AttributeDescriptor(string str)
+        {
+            // TODO: this should be code-generated to let the consuming library declare (and expand) its associations.
+
+            var tokens = str.Split(SeparatorChar);
+            
+            if (tokens.Length != 6)
+            {
+                Errors = AttributeDescriptorErrors.UnexpectedNumberOfTokens;
+                return;
+            }
+
+            if (tokens[0] != G3dPrefix)
+            {
+                Errors = AttributeDescriptorErrors.PrefixError;
+                return;
+            }
+
+            AssociationStr = tokens[1];
+            if (!Enum.TryParse(AssociationStr, out Association) || Association == Association.unknown)
+            {
+                Association = Association.unknown;
+                Errors |= AttributeDescriptorErrors.AssociationError;
+                // do not return; there may be more errors.
+            }
+
+            Semantic = tokens[2];
+            if (string.IsNullOrWhiteSpace(Semantic))
+            {
+                Errors |= AttributeDescriptorErrors.SemanticError;
+                // do not return; there may be more errors.
+            }
+
+            IndexStr = tokens[3];
+            if (!int.TryParse(IndexStr, out Index))
+            {
+                Errors |= AttributeDescriptorErrors.IndexError;
+                // do not return; there may be more errors.
+            }
+
+            DataTypeStr = tokens[4];
+            if (!Enum.TryParse(DataTypeStr, out DataType) || DataType == DataType.unknown)
+            {
+                DataType = DataType.unknown;
+                Errors |= AttributeDescriptorErrors.DataTypeError;
+                // do not return; there may be more errors.
+            }
+
+            DataArityStr = tokens[5];
+            if (!int.TryParse(DataArityStr, out DataArity))
+            {
+                Errors |= AttributeDescriptorErrors.DataArityError;
+            }
+
+            if (!HasDataTypeError && !HasDataArityError)
+            {
+                (DataTypeSize, DataElementSize) = GetDataSizes(DataType, DataArity);
+            }
+        }
+
+        public static (int dataTypeSize, int dataElementSize) GetDataSizes(DataType dataType, int dataArity)
+        {
+            var dataTypeSize = dataType.GetDataTypeSize();
+            return (dataTypeSize, dataTypeSize * dataArity);
+        }
+
+        /// <summary>
+        /// The current error if IsValid is false.
+        /// </summary>
+        public readonly AttributeDescriptorErrors Errors;
+
+        /// <summary>
+        /// Returns true if the Errors contains a data type error.
+        /// </summary>
+        public bool HasDataTypeError
+            => (Errors & AttributeDescriptorErrors.DataTypeError) == AttributeDescriptorErrors.DataTypeError;
+
+        /// <summary>
+        /// Returns true if the Errors contains a data arity error.
+        /// </summary>
+        public bool HasDataArityError
+            => (Errors & AttributeDescriptorErrors.DataArityError) == AttributeDescriptorErrors.DataArityError;
+
+        /// <summary>
+        /// Returns true if hte attribute descriptor was successfully parsed and its data types were recognized.
+        /// </summary>
+        public bool IsValid
+            => Errors == AttributeDescriptorErrors.None;
 
         /// <summary>
         /// The size in bytes of the DataType.
@@ -113,37 +228,22 @@ namespace G3d.AttributeDescriptor
         public readonly int DataElementSize;
 
         /// <summary>
-        /// Generates a URN representation of the attribute descriptor
+        /// Returns the string representation of the attribute descriptor, in the form "g3d:instance:transform:0:float32:16"
         /// </summary>
         public override string ToString()
             => Name;
 
-        /// <summary>
-        /// Parses a URN representation of the attribute descriptor to generate an actual attribute descriptor 
-        /// </summary>
-        public static AttributeDescriptor Parse(string str)
-        {
-            var tokens = str.Split(SeparatorChar);
-            if (tokens.Length != 6) throw new Exception("Expected 6 parts to the attribute descriptor");
-            if (tokens[0] != G3dPrefix) throw new Exception($"First part of the attribute descriptor must be {G3dPrefix}");
-            return new AttributeDescriptor(
-                tokens[1].ParseAssociation(),
-                tokens[2],
-                int.Parse(tokens[3]),
-                tokens[4].ParseDataType(),
-                int.Parse(tokens[5]));
-        }
-
-        /// <summary>
-        /// Validates the current attribute descriptor. Throws an exception if the validation fails.
-        /// </summary>
-        public bool Validate()
-        {
-            var str = ToString();
-            var tmp = Parse(str);
-            if (!str.Equals(tmp.ToString(), StringComparison.InvariantCulture))
-                throw new Exception("Invalid attribute descriptor (or internal error in the parsing/string conversion");
-            return true;
-        }
+        // TODO: Convert this to a unit test
+        ///// <summary>
+        ///// Validates the current attribute descriptor. Throws an exception if the validation fails.
+        ///// </summary>
+        //public bool Validate()
+        //{
+        //    var str = ToString();
+        //    var tmp = Parse(str);
+        //    if (!str.Equals(tmp.ToString(), StringComparison.InvariantCulture))
+        //        throw new Exception("Invalid attribute descriptor (or internal error in the parsing/string conversion");
+        //    return true;
+        //}
     }
 }
