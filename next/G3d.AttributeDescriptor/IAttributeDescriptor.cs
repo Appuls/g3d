@@ -1,4 +1,4 @@
-﻿namespace G3d.Core
+﻿namespace G3d
 {
     public interface IAttributeDescriptor
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace G3d.Core
+namespace G3d
 {
     [Flags]
     public enum AttributeDescriptorErrors

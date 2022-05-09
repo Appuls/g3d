@@ -1,13 +1,10 @@
 ﻿using System;
+using static G3d.Constants;
 
-namespace G3d.Core
+namespace G3d
 {
     public class AttributeDescriptorBase : IAttributeDescriptor
     {
-        public const string G3dPrefix = "g3d";
-        public const string Separator = ":";
-        public const char SeparatorChar = ':';
-
         /// <inhertdoc/>
         public string Name
             => $"{G3dPrefix}:{Association}:{Semantic}:{IndexStr}:{DataType}:{DataArity}";

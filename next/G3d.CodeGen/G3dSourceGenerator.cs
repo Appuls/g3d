@@ -1,4 +1,15 @@
+// # define DEBUG_SOURCE_GENERATOR
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.IO;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 
 namespace G3d.CodeGen
 {
@@ -7,31 +18,80 @@ namespace G3d.CodeGen
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            
+#if DEBUG_SOURCE_GENERATOR
+            if (!Debugger.IsAttached)
+            {
+                Debugger.Launch();
+            }
+            Debug.WriteLine("Initalize code generator");
+#endif
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
-            // Find the main method
-            var mainMethod = context.Compilation.GetEntryPoint(context.CancellationToken);
+            // Collect all the class declarations
+            var classDeclarationSyntaxes = context.Compilation.SyntaxTrees
+                .SelectMany(st => st.GetRoot().DescendantNodes()
+                    .Where(n => n is ClassDeclarationSyntax)
+                    .Select(n => n as ClassDeclarationSyntax))
+                .ToArray();
 
-            // Build up the source code
-            string source = $@" // Auto-generated code
-using System;
+            // Collect the class declarations which have the "AttributeDescriptor" attribute along with the name of the supplied buffer.
+            var cdsWithAttr = new List<(ClassDeclarationSyntax Cds, string AttrName)>();
+            foreach (var cds in classDeclarationSyntaxes)
+            {
+                if (cds.AttributeLists.Count == 0)
+                    continue;
 
-namespace {mainMethod.ContainingNamespace.ToDisplayString()}
-{{
-    public static partial class {mainMethod.ContainingType.Name}
+                foreach (var attr in cds.AttributeLists.SelectMany(a => a.Attributes))
+                {
+                    if (attr.Name.GetText().ToString() != "AttributeDescriptor")
+                        continue;
+
+                    var arg0 = attr.ArgumentList.Arguments[0].ToString();
+                    cdsWithAttr.Add((cds, arg0));
+                    break;
+                }
+            }
+
+            if (cdsWithAttr.Count == 0)
+                return;
+
+            // Collect the namespace.
+            if (!SyntaxNodeHelper.TryGetParentSyntax<NamespaceDeclarationSyntax>(cdsWithAttr.First().Cds, out var namespaceSyntax))
+            {
+                throw new Exception("Namespace not found.");
+            }
+            var @namespace = namespaceSyntax.Name.ToString();
+
+            // Generate the code for each class.
+            var classBuffers = new StringBuilder();
+            foreach (var (cds, attrName) in cdsWithAttr)
+            {
+                var className = cds.Identifier.ToString();
+
+                // TODO: more interface implementations for IAttributeBuffer
+
+                classBuffers.AppendLine($@"
+    public partial class {className} : IAttributeBuffer
     {{
-        static partial void HelloFrom(string name) =>
-            Console.WriteLine($""Generator says: Hi from '{{name}}'"");
-    }}
-}}
+        public IAttributeDescriptor AttributeDescriptor {{ get; }}
+            = new AttributeDescriptorBase({attrName});
+    }}");
+            }
+
+            // TODO: helper class to parse whole g3d AttributeBufferCollection from a bfast stream
+
+            // Final source, including using statements and namespace.
+            var source = $@"using System;
+using G3d;
+
+namespace {@namespace}
+{{{classBuffers}}}
 ";
-            var typeName = mainMethod.ContainingType.Name;
 
             // Add the source code to the compilation
-            context.AddSource($"{typeName}.g.cs", source);
+            context.AddSource($"AttributeBuffers.g.cs", source);
         }
     }
 }
