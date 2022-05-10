@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Text;
+using Vim.BFast;
 
 namespace G3d
 {
@@ -7,9 +9,10 @@ namespace G3d
     // https://twitter.com/FreyaHolmer/status/644881436982575104
     // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#coordinate-system-and-units
 
-    // The header is 7 bytes + 1 bytes padding. 
     public struct Header
     {
+        public const string SegmentName = "meta";
+        public const long SegmentNumBytes = 8; // The header is 7 bytes + 1 bytes padding.
         public const byte MagicA = 0x63;
         public const byte MagicB = 0xD0;
 
@@ -64,6 +67,25 @@ namespace G3d
             if (forwardVector < 0 || forwardVector > 5) throw new Exception("Front vector must be 0 (x), 1(y), 2(z), 3(-x), 4(-y), or 5(-z)");
             if (handedness < 0 || handedness > 1) throw new Exception("Handedness must be 0 (left) or 1 (right");
             return this;
+        }
+
+        public static bool IsSegmentHeader(string name, long size)
+            => name == SegmentName && size == SegmentNumBytes;
+
+        public static bool TryRead(Stream stream, long size, out Header outHeader)
+        {
+            var buffer = stream.ReadArray<byte>((int)size);
+
+            if (buffer[0] == MagicA && buffer[1] == MagicB)
+            {
+                outHeader = FromBytes(buffer);
+                return true;
+            }
+            else
+            {
+                outHeader = default;
+                return false;
+            }
         }
     }
 }

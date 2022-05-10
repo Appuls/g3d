@@ -18,8 +18,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G3d", "G3d\G3d.csproj", "{7
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vim.G3d", "Vim.G3d\Vim.G3d.csproj", "{A5F496FD-FE35-4146-8599-D164C39DD4FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G3d.AttributeDescriptor", "G3d.AttributeDescriptor\G3d.AttributeDescriptor.csproj", "{5B2A6DED-A8DE-4D0E-8E9E-44940D90BA8A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,10 +40,6 @@ Global
 		{A5F496FD-FE35-4146-8599-D164C39DD4FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5F496FD-FE35-4146-8599-D164C39DD4FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5F496FD-FE35-4146-8599-D164C39DD4FC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5B2A6DED-A8DE-4D0E-8E9E-44940D90BA8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B2A6DED-A8DE-4D0E-8E9E-44940D90BA8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B2A6DED-A8DE-4D0E-8E9E-44940D90BA8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5B2A6DED-A8DE-4D0E-8E9E-44940D90BA8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

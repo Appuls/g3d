@@ -1,4 +1,6 @@
-﻿namespace G3d
+﻿using System.IO;
+
+namespace G3d
 {
     public interface IAttributeDescriptor
     {

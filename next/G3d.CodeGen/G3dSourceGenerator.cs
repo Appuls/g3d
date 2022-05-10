@@ -76,7 +76,7 @@ namespace G3d.CodeGen
     public partial class {className} : IAttributeBuffer
     {{
         public IAttributeDescriptor AttributeDescriptor {{ get; }}
-            = new AttributeDescriptorBase({attrName});
+            = new AttributeDescriptor({attrName});
     }}");
             }
 

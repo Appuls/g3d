@@ -3,7 +3,7 @@ using static G3d.Constants;
 
 namespace G3d
 {
-    public class AttributeDescriptorBase : IAttributeDescriptor
+    public class AttributeDescriptor : IAttributeDescriptor
     {
         /// <inhertdoc/>
         public string Name
@@ -70,7 +70,7 @@ namespace G3d
         ///                       index    dataArity
         /// </code>
         /// </summary>
-        public AttributeDescriptorBase(
+        public AttributeDescriptor(
             string association,
             string semantic,
             int index,
@@ -106,7 +106,7 @@ namespace G3d
         /// <summary>
         /// Constructor. Parses an input string of the form: "g3d:instance:transform:0:float32:16".
         /// </summary>
-        public AttributeDescriptorBase(string str)
+        public AttributeDescriptor(string str)
         {
             var tokens = str.Split(SeparatorChar);
             
@@ -172,5 +172,21 @@ namespace G3d
         //        throw new Exception("Invalid attribute descriptor (or internal error in the parsing/string conversion");
         //    return true;
         //}
+
+        public static bool TryParse(string str, out AttributeDescriptor attributeDescriptor)
+        {
+            attributeDescriptor = null;
+
+            try
+            {
+                attributeDescriptor = new AttributeDescriptor(str);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return !attributeDescriptor.HasErrors;
+        }
     }
 }

@@ -12,7 +12,6 @@
   </PropertyGroup>
     
   <ItemGroup Label="Code Generation">
-    <ProjectReference Include="..\G3d.AttributeDescriptor\G3d.AttributeDescriptor.csproj" />
     <ProjectReference Include="..\G3d.CodeGen\G3d.CodeGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\G3d\G3d.csproj" />
     <!--
