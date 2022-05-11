@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -14,7 +14,20 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\G3d\G3d.csproj" />
+        <ProjectReference Include="..\G3d\G3d.csproj" GeneratePathProperty="true" PrivateAssets="all"/>
     </ItemGroup>
 
+    <!-- Workaround for referenced assembly in a source generator: https://github.com/dotnet/roslyn/discussions/47517#discussioncomment-64145 -->
+    <!-- BEGIN WORKAROUND -->
+    <PropertyGroup>
+        <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+    </PropertyGroup>
+
+    <Target Name="GetDependencyTargetPaths">
+        <ItemGroup>
+            <TargetPathWithTargetPlatformMoniker Include="..\G3d\bin\$(Configuration)\netstandard2.0\G3d.dll" IncludeRuntimeDependency="false" />
+        </ItemGroup>
+    </Target>
+    <!-- END WORKAROUND -->
+    
 </Project>

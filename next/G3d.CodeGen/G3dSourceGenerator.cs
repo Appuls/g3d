@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using G3d;
 
 namespace G3d.CodeGen
 {
@@ -48,7 +49,7 @@ namespace G3d.CodeGen
                     if (attr.Name.GetText().ToString() != "AttributeDescriptor")
                         continue;
 
-                    var arg0 = attr.ArgumentList.Arguments[0].ToString();
+                    var arg0 = attr.ArgumentList.Arguments[0].ToString().Trim('"');
                     cdsWithAttr.Add((cds, arg0));
                     break;
                 }
@@ -70,13 +71,18 @@ namespace G3d.CodeGen
             {
                 var className = cds.Identifier.ToString();
 
+                var testAttr = new AttributeDescriptor(attrName);
+                var ctorStr = testAttr.HasErrors
+                    ? $"(ERROR_{testAttr.Errors:G}, \"{attrName}\")"
+                    : $"new {nameof(AttributeDescriptor)}(\"{attrName}\")";
+
                 // TODO: more interface implementations for IAttributeBuffer
 
                 classBuffers.AppendLine($@"
     public partial class {className} : IAttributeBuffer
     {{
         public IAttributeDescriptor AttributeDescriptor {{ get; }}
-            = new AttributeDescriptor({attrName});
+            = {ctorStr};
     }}");
             }
 
