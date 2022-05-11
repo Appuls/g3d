@@ -1,4 +1,8 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace G3d.CodeGen
 {
@@ -40,6 +44,37 @@ namespace G3d.CodeGen
             {
                 return false;
             }
+        }
+
+        public static IEnumerable<(ClassDeclarationSyntax, AttributeSyntax)> GetClassesWithAttribute(
+            this IEnumerable<SyntaxTree> syntaxTrees,
+            string attributeName)
+        {
+            var classDeclarationSyntaxes = syntaxTrees
+                .SelectMany(st => st.GetRoot().DescendantNodes()
+                    .Where(n => n is ClassDeclarationSyntax)
+                    .Select(n => n as ClassDeclarationSyntax))
+                .ToArray();
+
+            // Collect the class declarations which have the attribute name.
+            var cdsWithAttr = new List<(ClassDeclarationSyntax Cds, AttributeSyntax Attr)>();
+            foreach (var cds in classDeclarationSyntaxes)
+            {
+                if (cds.AttributeLists.Count == 0)
+                    continue;
+
+                foreach (var attr in cds.AttributeLists.SelectMany(a => a.Attributes))
+                {
+                    if (attr.Name.GetText().ToString() != attributeName)
+                        continue;
+
+                    cdsWithAttr.Add((cds, attr));
+                    break;
+                    //var arg0 = attr.ArgumentList.Arguments[0].ToString().Trim('"');
+                    //cdsWithAttr.Add((cds, arg0));
+                }
+            }
+            return cdsWithAttr;
         }
     }
 }

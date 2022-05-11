@@ -17,4 +17,22 @@ namespace Vim.G3d
     [AttributeDescriptor("g3d:shape:vertexoffset:0:int32:1")] public partial class ShapeVertexOffsetBuffer { }
     [AttributeDescriptor("g3d:shape:color:0:float32:4")] public partial class ShapeColorBuffer { }
     [AttributeDescriptor("g3d:shape:width:0:float32:1")] public partial class ShapeWidthBuffer { }
+
+    [AttributeBufferFactory(
+        typeof(VertexBuffer),
+        typeof(IndexBuffer),
+        typeof(InstanceTransformBuffer),
+        typeof(InstanceParentBuffer),
+        typeof(InstanceMeshBuffer),
+        typeof(MeshSubmeshOffsetBuffer),
+        typeof(SubmeshIndexOffsetBuffer),
+        typeof(SubmeshMaterialBuffer),
+        typeof(MaterialColorBuffer),
+        typeof(MaterialGlossinessBuffer),
+        typeof(MaterialSmoothnessBuffer),
+        typeof(ShapeVertexBuffer),
+        typeof(ShapeVertexOffsetBuffer),
+        typeof(ShapeColorBuffer),
+        typeof(ShapeWidthBuffer))]
+    public partial class VimAttributeFactory : AttributeBufferFactory { }
 }

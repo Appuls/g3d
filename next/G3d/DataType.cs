@@ -61,5 +61,35 @@ namespace G3d
                     throw new ArgumentOutOfRangeException(nameof(dt), dt, null);
             }
         }
+
+        public static Type GetManagedType(this DataType dt)
+        {
+            switch (dt)
+            {
+                case DataType.uint8:
+                    return typeof(byte);
+                case DataType.int8:
+                    return typeof(sbyte);
+                case DataType.uint16:
+                    return typeof(ushort);
+                case DataType.int16:
+                    return typeof(short);
+                case DataType.uint32:
+                    return typeof(uint);
+                case DataType.int32:
+                    return typeof(int);
+                case DataType.uint64:
+                    return typeof(ulong);
+                case DataType.int64:
+                    return typeof(long);
+                case DataType.float32:
+                    return typeof(float);
+                case DataType.float64:
+                    return typeof(double);
+                case DataType.unknown:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(dt), dt, null);
+            }
+        }
     }
 }

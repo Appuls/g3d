@@ -28,76 +28,81 @@ namespace G3d.CodeGen
 #endif
         }
 
+        /// <summary>
+        /// Code generation entrypoint
+        /// </summary>
         public void Execute(GeneratorExecutionContext context)
         {
-            // Collect all the class declarations
-            var classDeclarationSyntaxes = context.Compilation.SyntaxTrees
-                .SelectMany(st => st.GetRoot().DescendantNodes()
-                    .Where(n => n is ClassDeclarationSyntax)
-                    .Select(n => n as ClassDeclarationSyntax))
-                .ToArray();
+            var syntaxTrees = context.Compilation.SyntaxTrees;
 
-            // Collect the class declarations which have the "AttributeDescriptor" attribute along with the name of the supplied buffer.
-            var cdsWithAttr = new List<(ClassDeclarationSyntax Cds, string AttrName)>();
-            foreach (var cds in classDeclarationSyntaxes)
-            {
-                if (cds.AttributeLists.Count == 0)
-                    continue;
-
-                foreach (var attr in cds.AttributeLists.SelectMany(a => a.Attributes))
-                {
-                    if (attr.Name.GetText().ToString() != "AttributeDescriptor")
-                        continue;
-
-                    var arg0 = attr.ArgumentList.Arguments[0].ToString().Trim('"');
-                    cdsWithAttr.Add((cds, arg0));
-                    break;
-                }
-            }
-
-            if (cdsWithAttr.Count == 0)
-                return;
-
-            // Collect the namespace.
-            if (!SyntaxNodeHelper.TryGetParentSyntax<NamespaceDeclarationSyntax>(cdsWithAttr.First().Cds, out var namespaceSyntax))
-            {
-                throw new Exception("Namespace not found.");
-            }
-            var @namespace = namespaceSyntax.Name.ToString();
-
-            // Generate the code for each class.
-            var classBuffers = new StringBuilder();
-            foreach (var (cds, attrName) in cdsWithAttr)
-            {
-                var className = cds.Identifier.ToString();
-
-                var testAttr = new AttributeDescriptor(attrName);
-                var ctorStr = testAttr.HasErrors
-                    ? $"(ERROR_{testAttr.Errors:G}, \"{attrName}\")"
-                    : $"new {nameof(AttributeDescriptor)}(\"{attrName}\")";
-
-                // TODO: more interface implementations for IAttributeBuffer
-
-                classBuffers.AppendLine($@"
-    public partial class {className} : IAttributeBuffer
-    {{
-        public IAttributeDescriptor AttributeDescriptor {{ get; }}
-            = {ctorStr};
-    }}");
-            }
-
-            // TODO: helper class to parse whole g3d AttributeBufferCollection from a bfast stream
+            var (@namespace, attributeBufferSrc) = GetAttributeBufferClassesAndNamespace(syntaxTrees);
 
             // Final source, including using statements and namespace.
             var source = $@"using System;
 using G3d;
+using Vim.BFast;
 
 namespace {@namespace}
-{{{classBuffers}}}
+{{
+{attributeBufferSrc}
+}}
 ";
 
             // Add the source code to the compilation
             context.AddSource($"AttributeBuffers.g.cs", source);
         }
+
+        /// <summary>
+        /// Returns the source code which implement the attribute buffers.
+        /// </summary>
+        public (string Namespace, string AttributeBufferSrc) GetAttributeBufferClassesAndNamespace(IEnumerable<SyntaxTree> syntaxTrees)
+        {
+            var bufferClasses = syntaxTrees
+                .GetClassesWithAttribute(nameof(AttributeDescriptor))
+                .Select(item => (item.Item1, item.Item2.ArgumentList.Arguments[0].ToString().Trim('"')))
+                .ToArray();
+
+            if (bufferClasses.Length == 0)
+                return default;
+
+            // Collect the namespace.
+            if (!SyntaxNodeHelper.TryGetParentSyntax<NamespaceDeclarationSyntax>(bufferClasses.First().Item1, out var namespaceSyntax))
+                throw new Exception("Namespace not found.");
+            var @namespace = namespaceSyntax.Name.ToString();
+
+            // Generate the code for each class.
+            var attrBufferSrc = new StringBuilder();
+            foreach (var (cds, attrName) in bufferClasses)
+            {
+                var className = cds.Identifier.ToString();
+
+                var attr = new AttributeDescriptor(attrName);
+                if (attr.HasErrors)
+                {
+                    attrBufferSrc.AppendLine($"(ERROR_{attr.Errors:G}, \"{attrName}\")");
+                    continue;
+                }
+
+                var attrType = attr.DataType.GetManagedType();
+
+                attrBufferSrc.AppendLine($@"
+    public partial class {className} : {nameof(IAttributeBuffer)}<{attrType}>
+    {{
+        public static {nameof(AttributeBufferReader)} CreateAttributeBufferReader()
+            => {nameof(AttributeBufferFactory)}.{nameof(AttributeBufferFactory.CreateAttributeBufferReader)}<{className}, {attrType}>();
+
+        public {nameof(IAttributeDescriptor)} {nameof(AttributeDescriptor)} {{ get; }}
+            = new {nameof(AttributeDescriptor)}(""{ attrName}"");
+
+        public {attrType}[] TypedData {{ get; set; }}
+
+        public Array Data => TypedData;
+    }}");
+            }
+
+            return (@namespace, attrBufferSrc.ToString());
+        }
+
+        //public string GetAttributeFactory
     }
 }

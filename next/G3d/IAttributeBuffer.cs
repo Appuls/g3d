@@ -8,14 +8,13 @@ namespace G3d
     public interface IAttributeBuffer
     {
         IAttributeDescriptor AttributeDescriptor { get; }
-        // TODO: collect all relevant actions an attribute buffer can make.
-        
+        Array Data { get; }
     }
 
     public interface IAttributeBuffer<T> : IAttributeBuffer
     {
         // TODO: typed data
 
-        // Write
+        T[] TypedData { get; set; }
     }
 }
