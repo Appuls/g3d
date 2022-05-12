@@ -5,16 +5,15 @@ using System.IO;
 
 namespace G3d
 {
-    public interface IAttributeBuffer
+    public interface IAttribute
     {
+        string Name { get; }
         IAttributeDescriptor AttributeDescriptor { get; }
         Array Data { get; }
     }
 
-    public interface IAttributeBuffer<T> : IAttributeBuffer
+    public interface IAttribute<T> : IAttribute
     {
-        // TODO: typed data
-
         T[] TypedData { get; set; }
     }
 }

@@ -12,11 +12,11 @@ namespace G3d
     }
 
     [AttributeUsage(AttributeTargets.Class)]
-    public class AttributeBufferFactoryAttribute : Attribute
+    public class AttributeCollectionAttribute : Attribute
     {
         private readonly Type[] _bufferClasses;
 
-        public AttributeBufferFactoryAttribute(params Type[] bufferClasses)
+        public AttributeCollectionAttribute(params Type[] bufferClasses)
             => _bufferClasses = bufferClasses;
     }
 }

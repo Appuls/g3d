@@ -6,22 +6,21 @@ namespace G3d
     public class G3d
     {
         public readonly Header Header;
-        public readonly AttributeBufferCollection AttributeBuffers;
+        public readonly AttributeCollection Attributes;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public G3d(Header header, AttributeBufferCollection attributeBuffers)
+        public G3d(Header header, AttributeCollection attributes)
         {
             Header = header;
-            AttributeBuffers = attributeBuffers;
+            Attributes = attributes;
         }
 
-        public static bool TryReadG3d(Stream stream, AttributeBufferFactory factory, out G3d g3d)
+        public static bool TryReadG3d(Stream stream, AttributeCollection collection, out G3d g3d)
         {
             g3d = null;
             Header? header = null;
-            var attributeBuffers = new AttributeBufferCollection(factory);
 
             object OnG3dSegment(Stream s, string name, long size)
             {
@@ -31,8 +30,8 @@ namespace G3d
                     return header = outHeader;
                 }
 
-                // The segment is not the header so treat it as an attribute buffer.
-                return attributeBuffers.ReadAttributeBuffer(s, name, size);
+                // The segment is not the header so treat it as an attribute.
+                return collection.ReadAttribute(s, name, size);
             }
 
             _ = stream.ReadBFast(OnG3dSegment);
@@ -42,8 +41,8 @@ namespace G3d
                 return false;
 
             // Instantiate the object and return.
-            g3d = new G3d(header.Value, attributeBuffers);
-            return g3d != null;
+            g3d = new G3d(header.Value, collection);
+            return true;
         }
     }
 }
