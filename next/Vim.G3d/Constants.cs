@@ -1,4 +1,4 @@
-﻿namespace G3d
+﻿namespace Vim.G3d
 {
     public static class Constants
     {

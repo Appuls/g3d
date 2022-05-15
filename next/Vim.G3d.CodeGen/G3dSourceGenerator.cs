@@ -11,9 +11,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using G3d;
+using Vim.G3d;
 
-namespace G3d.CodeGen
+namespace Vim.G3d.CodeGen
 {
     [Generator]
     public class G3dSourceGenerator : ISourceGenerator
@@ -42,8 +42,8 @@ namespace G3d.CodeGen
 
             // Final source, including using statements and namespace.
             var source = $@"using System;
-using G3d;
 using Vim.BFast;
+using Vim.G3d;
 
 namespace {@namespace}
 {{
@@ -139,7 +139,7 @@ namespace {@namespace}
                 var className = cds.Identifier.ToString();
 
                 attrCollectionSrc.AppendLine(
-$@"    public partial class {className} : {nameof(AttributeCollection)}
+$@"    public partial class {className}
     {{
         public {className}()
         {{

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace G3d
+namespace Vim.G3d
 {
     public interface IAttribute
     {

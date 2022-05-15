@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <!--<TargetFramework>net6.0</TargetFramework>-->
+    <!--<OutputType>Exe</OutputType>-->
+  </PropertyGroup>
+
+  <PropertyGroup Label="Code Generation">
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(ProjectPath).</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+    
+  <ItemGroup Label="Code Generation">
+    <ProjectReference Include="..\Vim.G3d.CodeGen\Vim.G3d.CodeGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Vim.G3d\Vim.G3d.csproj" />
+    <!--
+      The following lines allow us to view the generated code more clearly in the project structure (you can even set breakpoints in there!)
+      The <Compile Remove=...> line avoids the redundant compilation of the same files;
+      the source generation mechanism implicitly adds these files during the compilation of this project.
+    -->
+    <None Include="Vim.G3d.CodeGen\**\*.cs" />
+    <Compile Remove="Vim.G3d.CodeGen\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
+
+  <PropertyGroup Label="NuGetDependenciesVersions">
+    <Math3DVersion>1.6.0</Math3DVersion>
+    <BFastVersion>1.4.1</BFastVersion>
+    <LinqArrayVersion>1.1.0</LinqArrayVersion>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition="!$([System.String]::IsNullOrWhitespace($(Math3DPath)))">
+      <ItemGroup>
+        <ProjectReference Include="$(Math3DPath)" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="Vim.Math3D" Version="$(Math3DVersion)" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+
+  <Choose>
+    <When Condition="!$([System.String]::IsNullOrWhitespace($(BFastPath)))">
+      <ItemGroup>
+        <ProjectReference Include="$(BFastPath)" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="Vim.BFast" Version="$(BFastVersion)" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+</Project>

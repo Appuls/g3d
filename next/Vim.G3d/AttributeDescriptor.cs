@@ -1,7 +1,7 @@
 ﻿using System;
-using static G3d.Constants;
+using static Vim.G3d.Constants;
 
-namespace G3d
+namespace Vim.G3d
 {
     public class AttributeDescriptor : IAttributeDescriptor
     {

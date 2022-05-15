@@ -1,8 +1,8 @@
 ﻿using System;
-using G3d;
 using Vim.BFast;
+using Vim.G3d;
 
-namespace Vim.G3d
+namespace Vim.G3d.Attributes
 {
 
     public partial class CornersPerFaceAttribute : IAttribute<System.Int32>
@@ -293,7 +293,7 @@ namespace Vim.G3d
         public Array Data => TypedData;
     }
 
-    public partial class VimAttributeCollection : AttributeCollection
+    public partial class VimAttributeCollection
     {
         public VimAttributeCollection()
         {

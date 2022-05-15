@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace G3d
+namespace Vim.G3d
 {
     public enum DataType
     {

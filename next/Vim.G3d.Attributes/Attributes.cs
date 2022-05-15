@@ -1,6 +1,6 @@
-﻿using G3d;
+﻿using Vim.G3d;
 
-namespace Vim.G3d
+namespace Vim.G3d.Attributes
 {
     [AttributeDescriptor("g3d:all:facesize:0:int32:1")] public partial class CornersPerFaceAttribute { }
     [AttributeDescriptor("g3d:vertex:position:0:float32:3")] public partial class VertexAttribute { }
@@ -36,5 +36,5 @@ namespace Vim.G3d
         typeof(ShapeVertexOffsetAttribute),
         typeof(ShapeColorAttribute),
         typeof(ShapeWidthAttribute))]
-    public partial class VimAttributeCollection { }
+    public partial class VimAttributeCollection : AttributeCollection { }
 }

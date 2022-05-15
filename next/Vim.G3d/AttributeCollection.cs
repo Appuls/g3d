@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using Vim.BFast;
 
-namespace G3d
+namespace Vim.G3d
 {
     public delegate IAttribute AttributeReader(Stream stream, long size);
 

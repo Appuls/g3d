@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using Vim.BFast;
 
-namespace G3d
+namespace Vim.G3d
 {
     // http://docs.autodesk.com/FBX/2014/ENU/FBX-SDK-Documentation/index.html?url=files/GUID-CC93340E-C4A1-49EE-B048-E898F856CFBF.htm,topicNumber=d30e8478
     // https://twitter.com/FreyaHolmer/status/644881436982575104

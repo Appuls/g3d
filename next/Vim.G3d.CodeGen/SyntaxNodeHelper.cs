@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace G3d.CodeGen
+namespace Vim.G3d.CodeGen
 {
     // From: https://stackoverflow.com/a/23249021
 

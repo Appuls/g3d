@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G3d.CodeGen", "G3d.CodeGen\G3d.CodeGen.csproj", "{343C2251-DBD1-4AD4-9EF3-37BA095287A3}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3D582220-F95B-4F97-B754-17F1403DC8D0}"
 	ProjectSection(SolutionItems) = preProject
 		TODO.md = TODO.md
@@ -14,9 +12,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OLD", "OLD", "{FEAB1152-657
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vim.G3d", "..\csharp\Vim.G3d\Vim.G3d.csproj", "{B0AA7814-0781-4F4E-A849-DA207AEBDCBA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G3d", "G3d\G3d.csproj", "{72078C77-EE31-4861-AA2B-FEB65662D972}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vim.G3d", "Vim.G3d\Vim.G3d.csproj", "{72078C77-EE31-4861-AA2B-FEB65662D972}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vim.G3d", "Vim.G3d\Vim.G3d.csproj", "{A5F496FD-FE35-4146-8599-D164C39DD4FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vim.G3d.Tests", "Vim.G3d.Tests\Vim.G3d.Tests.csproj", "{8950B1EE-BF97-475E-848F-3BA90658534E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vim.G3d.CodeGen", "Vim.G3d.CodeGen\Vim.G3d.CodeGen.csproj", "{225346DC-7CEB-4B13-A5A9-76AFA58D4932}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vim.G3d.Attributes", "Vim.G3d.Attributes\Vim.G3d.Attributes.csproj", "{184CB721-B8E7-44C2-A103-73CEF22696C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,10 +26,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{343C2251-DBD1-4AD4-9EF3-37BA095287A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{343C2251-DBD1-4AD4-9EF3-37BA095287A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{343C2251-DBD1-4AD4-9EF3-37BA095287A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{343C2251-DBD1-4AD4-9EF3-37BA095287A3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B0AA7814-0781-4F4E-A849-DA207AEBDCBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0AA7814-0781-4F4E-A849-DA207AEBDCBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0AA7814-0781-4F4E-A849-DA207AEBDCBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -36,10 +34,18 @@ Global
 		{72078C77-EE31-4861-AA2B-FEB65662D972}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72078C77-EE31-4861-AA2B-FEB65662D972}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72078C77-EE31-4861-AA2B-FEB65662D972}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A5F496FD-FE35-4146-8599-D164C39DD4FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A5F496FD-FE35-4146-8599-D164C39DD4FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A5F496FD-FE35-4146-8599-D164C39DD4FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A5F496FD-FE35-4146-8599-D164C39DD4FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8950B1EE-BF97-475E-848F-3BA90658534E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8950B1EE-BF97-475E-848F-3BA90658534E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8950B1EE-BF97-475E-848F-3BA90658534E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8950B1EE-BF97-475E-848F-3BA90658534E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{225346DC-7CEB-4B13-A5A9-76AFA58D4932}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{225346DC-7CEB-4B13-A5A9-76AFA58D4932}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{225346DC-7CEB-4B13-A5A9-76AFA58D4932}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{225346DC-7CEB-4B13-A5A9-76AFA58D4932}.Release|Any CPU.Build.0 = Release|Any CPU
+		{184CB721-B8E7-44C2-A103-73CEF22696C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{184CB721-B8E7-44C2-A103-73CEF22696C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{184CB721-B8E7-44C2-A103-73CEF22696C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{184CB721-B8E7-44C2-A103-73CEF22696C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Vim.BFast;
 
-namespace G3d
+namespace Vim.G3d
 {
     public class G3d
     {

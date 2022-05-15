@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace G3d
+namespace Vim.G3d
 {
     public interface IAttributeDescriptor
     {

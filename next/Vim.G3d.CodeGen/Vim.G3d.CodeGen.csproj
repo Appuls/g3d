@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\G3d\G3d.csproj" GeneratePathProperty="true" PrivateAssets="all"/>
+        <ProjectReference Include="..\Vim.G3d\Vim.G3d.csproj" GeneratePathProperty="true" PrivateAssets="all" />
     </ItemGroup>
 
     <!-- Workaround for referenced assembly in a source generator: https://github.com/dotnet/roslyn/discussions/47517#discussioncomment-64145 -->
@@ -25,7 +25,7 @@
 
     <Target Name="GetDependencyTargetPaths">
         <ItemGroup>
-            <TargetPathWithTargetPlatformMoniker Include="..\G3d\bin\$(Configuration)\netstandard2.0\G3d.dll" IncludeRuntimeDependency="false" />
+            <TargetPathWithTargetPlatformMoniker Include="..\Vim.G3d\bin\$(Configuration)\netstandard2.0\Vim.G3d.dll" IncludeRuntimeDependency="false" />
         </ItemGroup>
     </Target>
     <!-- END WORKAROUND -->

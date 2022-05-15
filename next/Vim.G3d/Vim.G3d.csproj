@@ -1,31 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <!--<TargetFramework>net6.0</TargetFramework>-->
-    <!--<OutputType>Exe</OutputType>-->
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
   </PropertyGroup>
-
-  <PropertyGroup Label="Code Generation">
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>$(ProjectPath).</CompilerGeneratedFilesOutputPath>
-  </PropertyGroup>
-    
-  <ItemGroup Label="Code Generation">
-    <ProjectReference Include="..\G3d.CodeGen\G3d.CodeGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\G3d\G3d.csproj" />
-    <!--
-      The following lines allow us to view the generated code more clearly in the project structure (you can even set breakpoints in there!)
-      The <Compile Remove=...> line avoids the redundant compilation of the same files;
-      the source generation mechanism implicitly adds these files during the compilation of this project.
-    -->
-    <None Include="G3d.CodeGen\**\*.cs" />
-    <Compile Remove="G3d.CodeGen\**\*.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-  </ItemGroup>
 
   <PropertyGroup Label="NuGetDependenciesVersions">
     <Math3DVersion>1.6.0</Math3DVersion>
