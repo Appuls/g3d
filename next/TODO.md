@@ -1,6 +1,7 @@
 # TODO
 
 - Reader
+    - Hard to navigate to generated code (see Test assertion)
     - arity conversion
     - Unit tests
 - Writer

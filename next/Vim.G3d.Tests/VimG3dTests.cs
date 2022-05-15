@@ -30,6 +30,10 @@ namespace Vim.G3d.Tests
 
             var result = G3d.TryReadG3d(stream, vimAttributeCollection, out var g3d);
             Assert.IsTrue(result);
+
+            // TODO: why can't this navigate to the generated code?
+            var cornerAttribute = g3d.Attributes.Attributes[IndexAttribute.AttributeName];
+            Assert.IsNotNull(cornerAttribute);
         }
     }
 }
