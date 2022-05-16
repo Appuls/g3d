@@ -1,6 +1,9 @@
 using NUnit.Framework;
+using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using Vim.G3d.Attributes;
+
 
 namespace Vim.G3d.Tests
 {
@@ -12,18 +15,27 @@ namespace Vim.G3d.Tests
         public static string TestInputFolder = Path.Combine(RootFolder, "data");
         public static string TestOutputFolder = Path.Combine(RootFolder, "data", "out");
 
-        [Test]
-        public static void UnexpectedG3dTest()
+        public static string? PrepareTestDir([CallerMemberName] string? testName = null)
         {
-            var testDir = Path.Combine(TestOutputFolder, nameof(UnexpectedG3dTest));
-            
+            if (testName == null)
+                throw new ArgumentException(nameof(testName));
+
+            var testDir = Path.Combine(TestOutputFolder, testName);
+
             // Prepare the test directory
             if (Directory.Exists(testDir))
                 Directory.Delete(testDir, true);
             Directory.CreateDirectory(testDir);
 
+            return testDir;
+        }
+
+        [Test]
+        public static void UnexpectedG3dTest()
+        {
+            var testDir = PrepareTestDir();
+
             var input = new FileInfo(Path.Combine(TestInputFolder, "unexpected.g3d"));
-            // var output = Path.Combine(testDir, "unexpected.g3d");
 
             var vimAttributeCollection = new VimAttributeCollection();
             using var stream = input.OpenRead();
@@ -31,7 +43,6 @@ namespace Vim.G3d.Tests
             var result = G3d.TryReadG3d(stream, vimAttributeCollection, out var g3d);
             Assert.IsTrue(result);
 
-            // TODO: why can't this navigate to the generated code?
             var cornerAttribute = g3d.Attributes.Attributes[IndexAttribute.AttributeName];
             Assert.IsNotNull(cornerAttribute);
         }

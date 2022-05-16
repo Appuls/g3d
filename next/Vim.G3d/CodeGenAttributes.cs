@@ -6,9 +6,14 @@ namespace Vim.G3d
     public class AttributeDescriptorAttribute : Attribute
     {
         private readonly string _name;
+        private readonly Type _arrayType;
+
+        public AttributeDescriptorAttribute(string name, Type arrayType)
+            => (_name, _arrayType) = (name, arrayType);
 
         public AttributeDescriptorAttribute(string name)
-            => _name = name;
+            : this(name, null)
+        { }
     }
 
     [AttributeUsage(AttributeTargets.Class)]

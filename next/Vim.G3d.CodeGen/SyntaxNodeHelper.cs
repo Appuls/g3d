@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -46,7 +46,7 @@ namespace Vim.G3d.CodeGen
             }
         }
 
-        public static IEnumerable<(ClassDeclarationSyntax, AttributeSyntax)> GetClassesWithAttribute(
+        public static IEnumerable<(ClassDeclarationSyntax ClassDeclarationSyntax, AttributeSyntax AttributeSyntax)> GetClassesWithAttribute(
             this IEnumerable<SyntaxTree> syntaxTrees,
             string attributeName)
         {
@@ -75,6 +75,17 @@ namespace Vim.G3d.CodeGen
                 }
             }
             return cdsWithAttr;
+        }
+
+        private static readonly Regex TypeofRegex = new Regex(@"\s*typeof\(([a-zA-Z0-9-_.]+)\)\s*");
+
+        public static string TypeofArg(string str)
+        {
+            if (str == null)
+                return null;
+
+            var match = TypeofRegex.Match(str);
+            return match.Success ? match.Groups[1].Value : null;
         }
     }
 }

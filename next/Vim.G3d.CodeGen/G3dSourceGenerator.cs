@@ -1,4 +1,4 @@
-// # define DEBUG_SOURCE_GENERATOR
+//# define DEBUG_SOURCE_GENERATOR
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -44,6 +44,7 @@ namespace Vim.G3d.CodeGen
             var source = $@"using System;
 using Vim.BFast;
 using Vim.G3d;
+using Vim.Math3d;
 
 namespace {@namespace}
 {{
@@ -63,7 +64,13 @@ namespace {@namespace}
         {
             var bufferClasses = syntaxTrees
                 .GetClassesWithAttribute(nameof(AttributeDescriptor))
-                .Select(item => (item.Item1, item.Item2.ArgumentList.Arguments[0].ToString().Trim('"')))
+                .Select(item =>
+                {
+                    var args = item.Item2.ArgumentList.Arguments.ToArray();
+                    var arg0 = args[0].ToString().Trim('"'); // mandatory argument
+                    var arg1 = args.Length > 1 ? SyntaxNodeHelper.TypeofArg(args[1].ToString()) : null; // type argument
+                    return (item.ClassDeclarationSyntax, AttrName: arg0, ArrayType: arg1);
+                })
                 .ToArray();
 
             if (bufferClasses.Length == 0)
@@ -76,7 +83,7 @@ namespace {@namespace}
 
             // Generate the code for each class.
             var attrSrc = new StringBuilder();
-            foreach (var (cds, attrName) in bufferClasses)
+            foreach (var (cds, attrName, arrayType) in bufferClasses)
             {
                 var className = cds.Identifier.ToString();
 
@@ -87,9 +94,11 @@ namespace {@namespace}
                     continue;
                 }
 
-                var attrType = attr.DataType.GetManagedType();
+                var attrType = !string.IsNullOrEmpty(arrayType)
+                    ? arrayType
+                    : attr.DataType.GetManagedType().ToString();
 
-                attrSrc.AppendLine($@"
+                var classSrc = $@"
     public partial class {className} : {nameof(IAttribute)}<{attrType}>
     {{
         public const string AttributeName = ""{attrName}"";
@@ -106,7 +115,8 @@ namespace {@namespace}
         public {attrType}[] TypedData {{ get; set; }}
 
         public Array Data => TypedData;
-    }}");
+    }}";
+                attrSrc.AppendLine(classSrc);
             }
 
             return (@namespace, attrSrc.ToString());
@@ -120,9 +130,8 @@ namespace {@namespace}
                 return Array.Empty<string>();
 
             return argList
-                .Select(arg => typeofRegex.Match(arg.ToString()))
-                .Where(m => m.Success)
-                .Select(m => m.Groups[1].Value)
+                .Select(arg => SyntaxNodeHelper.TypeofArg(arg.ToString()))
+                .Where(a => !string.IsNullOrEmpty(a))
                 .ToArray();
         }
 

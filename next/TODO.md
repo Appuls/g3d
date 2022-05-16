@@ -1,8 +1,7 @@
 # TODO
 
 - Reader
-    - Hard to navigate to generated code (see Test assertion)
-    - arity conversion
+    - Vector3/etc array read codegen
     - Unit tests
 - Writer
     - Inspire from BigG3dWriter
