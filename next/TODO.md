@@ -1,5 +1,7 @@
 # TODO
 
+Code Generation Issue: https://github.com/dotnet/roslyn/issues/49249
+
 - Reader
     - Vector3/etc array read codegen
     - Unit tests
