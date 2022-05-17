@@ -1,38 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\G3d.Build.props" />
+
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
-  <PropertyGroup Label="NuGetDependenciesVersions">
-    <Math3DVersion>1.6.0</Math3DVersion>
-    <BFastVersion>1.4.1</BFastVersion>
-    <LinqArrayVersion>1.1.0</LinqArrayVersion>
-  </PropertyGroup>
-
-  <Choose>
-    <When Condition="!$([System.String]::IsNullOrWhitespace($(Math3DPath)))">
-      <ItemGroup>
-        <ProjectReference Include="$(Math3DPath)" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="Vim.Math3D" Version="$(Math3DVersion)" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
-
-  <Choose>
-    <When Condition="!$([System.String]::IsNullOrWhitespace($(BFastPath)))">
-      <ItemGroup>
-        <ProjectReference Include="$(BFastPath)" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="Vim.BFast" Version="$(BFastVersion)" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
 </Project>

@@ -70,8 +70,6 @@ namespace Vim.G3d.CodeGen
 
                     cdsWithAttr.Add((cds, attr));
                     break;
-                    //var arg0 = attr.ArgumentList.Arguments[0].ToString().Trim('"');
-                    //cdsWithAttr.Add((cds, arg0));
                 }
             }
             return cdsWithAttr;

@@ -5,6 +5,7 @@ VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3D582220-F95B-4F97-B754-17F1403DC8D0}"
 	ProjectSection(SolutionItems) = preProject
+		G3d.Build.props = G3d.Build.props
 		TODO.md = TODO.md
 	EndProjectSection
 EndProject

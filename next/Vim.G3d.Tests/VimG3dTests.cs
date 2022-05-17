@@ -2,8 +2,10 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Vim.BFast;
 using Vim.G3d.Attributes;
 
+using static Vim.BFast.BFast;
 
 namespace Vim.G3d.Tests
 {
@@ -34,7 +36,6 @@ namespace Vim.G3d.Tests
         public static void UnexpectedG3dTest()
         {
             var testDir = PrepareTestDir();
-
             var input = new FileInfo(Path.Combine(TestInputFolder, "unexpected.g3d"));
 
             var vimAttributeCollection = new VimAttributeCollection();
@@ -45,6 +46,28 @@ namespace Vim.G3d.Tests
 
             var cornerAttribute = g3d.Attributes.Attributes[IndexAttribute.AttributeName];
             Assert.IsNotNull(cornerAttribute);
+        }
+
+        [Test]
+        public static void ReadVimTest()
+        {
+            var testDir = PrepareTestDir();
+            var inputVim = new FileInfo(Path.Combine(TestInputFolder, "Mechanical_Room.r2017.vim"));
+
+            using var stream = inputVim.OpenRead();
+
+            G3d? g3d = null;
+            stream.ReadBFast<object?>((s, name, size) =>
+            {
+                if (name == "geometry")
+                    G3d.TryReadG3d(s, new VimAttributeCollection(), out g3d);
+                else
+                    stream.Seek(size, SeekOrigin.Current);
+
+                return null;
+            });
+
+            Assert.IsNotNull(g3d);
         }
     }
 }
