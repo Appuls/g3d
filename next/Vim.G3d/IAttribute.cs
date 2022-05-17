@@ -10,6 +10,7 @@ namespace Vim.G3d
         string Name { get; }
         IAttributeDescriptor AttributeDescriptor { get; }
         Array Data { get; }
+        void Write(Stream stream);
     }
 
     public interface IAttribute<T> : IAttribute

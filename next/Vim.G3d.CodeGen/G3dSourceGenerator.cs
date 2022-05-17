@@ -42,6 +42,7 @@ namespace Vim.G3d.CodeGen
 
             // Final source, including using statements and namespace.
             var source = $@"using System;
+using System.IO;
 using Vim.BFast;
 using Vim.G3d;
 using Vim.Math3d;
@@ -115,6 +116,9 @@ namespace {@namespace}
         public {attrType}[] TypedData {{ get; set; }}
 
         public Array Data => TypedData;
+
+        public void Write(Stream stream)
+            => stream.Write(TypedData);
     }}";
                 attrSrc.AppendLine(classSrc);
             }

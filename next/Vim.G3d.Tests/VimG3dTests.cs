@@ -41,7 +41,7 @@ namespace Vim.G3d.Tests
             var vimAttributeCollection = new VimAttributeCollection();
             using var stream = input.OpenRead();
 
-            var result = G3d.TryReadG3d(stream, vimAttributeCollection, out var g3d);
+            var result = G3d.TryRead(stream, vimAttributeCollection, out var g3d);
             Assert.IsTrue(result);
 
             var cornerAttribute = g3d.Attributes.Attributes[IndexAttribute.AttributeName];
@@ -60,7 +60,7 @@ namespace Vim.G3d.Tests
             stream.ReadBFast<object?>((s, name, size) =>
             {
                 if (name == "geometry")
-                    G3d.TryReadG3d(s, new VimAttributeCollection(), out g3d);
+                    G3d.TryRead(s, new VimAttributeCollection(), out g3d);
                 else
                     stream.Seek(size, SeekOrigin.Current);
 
