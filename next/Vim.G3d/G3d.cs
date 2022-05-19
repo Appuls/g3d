@@ -1,11 +1,23 @@
 ﻿using System.IO;
 using Vim.BFast;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Vim.G3d
 {
+    /// <summary>
+    /// A G3d is composed of a header and a collection of attributes containing descriptors and their data.
+    /// </summary>
     public class G3d
     {
+        /// <summary>
+        /// The header of the G3d. Corresponds to the "meta" segment.
+        /// </summary>
         public readonly Header Header;
+
+        /// <summary>
+        /// The attributes of the G3d.
+        /// </summary>
         public readonly AttributeCollection Attributes;
 
         /// <summary>
@@ -17,6 +29,16 @@ namespace Vim.G3d
             Attributes = attributes;
         }
 
+        /// <summary>
+        /// Constructor. Uses the default header.
+        /// </summary>
+        public G3d(AttributeCollection attributes) 
+            : this(Header.Default, attributes)
+        { }
+
+        /// <summary>
+        /// Reads the stream using the attribute collection's readers and outputs a G3d upon success.
+        /// </summary>
         public static bool TryRead(Stream stream, AttributeCollection collection, out G3d g3d)
         {
             g3d = null;
@@ -45,223 +67,61 @@ namespace Vim.G3d
             return true;
         }
 
-        public void Write(Stream stream)
+        /// <summary>
+        /// Returns the G3d BFast header information, including buffer names and buffer sizes in bytes.
+        /// </summary>
+        private static (BFastHeader BFastHeader, string[] BufferNames, long[] BufferSizesInBytes ) GetBFastHeaderInfo(
+            Header header,
+            IReadOnlyList<IAttribute> attributes)
         {
-            // TODO: inspire from big3dwriter below
+            var nameList = new List<string>();
+            var sizesInBytesList = new List<long>();
+
+            var metaBuffer = header.ToBytes().ToNamedBuffer(Header.SegmentName);
+            nameList.Add(metaBuffer.Name);
+            sizesInBytesList.Add(metaBuffer.NumBytes());
+
+            foreach (var attribute in attributes)
+            {
+                nameList.Add(attribute.Name);
+                sizesInBytesList.Add(attribute.GetSizeInBytes());
+            }
+
+            var bufferNames = nameList.ToArray();
+            var bufferSizesInBytes = sizesInBytesList.ToArray();
+
+            return (
+                BFast.BFast.CreateBFastHeader(bufferSizesInBytes, bufferNames),
+                bufferNames,
+                bufferSizesInBytes
+            );
         }
 
-        /* BigG3dWriter:
+        private delegate void StreamWriter(Stream stream);
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Vim.Math3d;
-using Vim.G3d;
-using Vim.LinqArray;
-using Vim.BFast;
-using System.IO;
-using Vim.DotNetUtilities;
-using static Vim.DataFormat.DocumentBuilder;
-
-namespace Vim.DataFormat
-{
-    /// <summary>
-    /// This is a helper class for writing the really big G3Ds needed in a VIM
-    /// </summary>
-    public class BigG3dWriter : IBFastComponent
-    {
-        public INamedBuffer Meta { get; }
-        public string[] Names { get; }
-        public long[] Sizes { get; }
-        public BFastHeader Header { get; }
-        public List<SubdividedMesh> Meshes { get; }
-        public List<Instance> Instances { get; }
-        public List<Shape> Shapes { get; }
-        public List<Material> Materials { get; }
-
-        // Computed fields
-        public int[] MeshVertexOffsets { get; }
-        public int[] MeshIndexOffsets { get; }
-        public int[] MeshSubmeshOffset { get; }
-        public int[] SubmeshIndexOffsets { get; }
-        public int[] ShapeVertexOffsets { get; }
-
-        public BigG3dWriter(List<SubdividedMesh> meshes, List<Instance> instances, List<Shape> shapes, List<Material> materials, G3dHeader? header = null, bool useColors = false)
-        {
-            Meshes = meshes;
-            Instances = instances;
-            Shapes = shapes;
-            Materials = materials;
-            var totalSubmeshCount = meshes.Select(s => s.SubmeshesIndexOffset.Count).Sum();
-
-            // Compute the Vertex offsets and index offsets 
-            MeshVertexOffsets = new int[meshes.Count];
-            MeshIndexOffsets = new int[meshes.Count];
-            SubmeshIndexOffsets = new int[totalSubmeshCount];
-            MeshSubmeshOffset = new int[meshes.Count];
-
-            var n = meshes.Count;
-
-            for (var i = 1; i < n; ++i)
-            {
-                MeshVertexOffsets[i] = MeshVertexOffsets[i - 1] + meshes[i - 1].Vertices.Count;
-                MeshIndexOffsets[i] = MeshIndexOffsets[i - 1] + meshes[i - 1].Indices.Count;
-                MeshSubmeshOffset[i] = MeshSubmeshOffset[i - 1] + meshes[i - 1].SubmeshesIndexOffset.Count;
-            }
-
-            var subIndex =0;
-            var previousIndexCount = 0;
-            foreach(var geo in meshes)
-            {
-                foreach(var sub in geo.SubmeshesIndexOffset)
-                {
-                    SubmeshIndexOffsets[subIndex++] = sub + previousIndexCount;
-                }
-                previousIndexCount += geo.Indices.Count;
-            }
-
-            var submeshCount = meshes.Select(s => s.SubmeshesIndexOffset.Count).Sum();
-
-            var totalVertices = n == 0 ? 0 : MeshVertexOffsets[n - 1] + meshes[n - 1].Vertices.Count;
-            var totalIndices = n == 0 ? 0 : MeshIndexOffsets[n - 1] + meshes[n - 1].Indices.Count;
-            long totalFaces = totalIndices / 3;
-
-            // Compute the shape vertex offsets
-            var numShapes = shapes.Count;
-            ShapeVertexOffsets = new int[numShapes];
-            for (var i = 1; i < numShapes; ++i)
-            {
-                ShapeVertexOffsets[i] = ShapeVertexOffsets[i - 1] + shapes[i - 1].Vertices.Count;
-            }
-            var numShapeVertices = numShapes == 0 ? 0 : ShapeVertexOffsets[numShapes - 1] + shapes[numShapes - 1].Vertices.Count;
-
-            Meta = (header ?? G3dHeader.Default).ToBytes().ToNamedBuffer("meta");
-
-            (long size, string name) AttributeSizeAndName(string attributeName, long count)
-                => (AttributeDescriptor.Parse(attributeName).DataElementSize * count, attributeName);
-
-            var writers = new List<(long size, string attribute)>()
-            {
-                (Meta.NumBytes(), Meta.Name),
-                AttributeSizeAndName(CommonAttributes.Position, totalVertices),
-                AttributeSizeAndName(CommonAttributes.Index, totalIndices),
-
-                AttributeSizeAndName(CommonAttributes.MeshSubmeshOffset, meshes.Count),
-                AttributeSizeAndName(CommonAttributes.SubmeshIndexOffset, submeshCount),
-                AttributeSizeAndName(CommonAttributes.SubmeshMaterial, submeshCount),
-
-                AttributeSizeAndName(CommonAttributes.InstanceTransform, instances.Count),
-                AttributeSizeAndName(CommonAttributes.InstanceParent, instances.Count), // TODO: remove this?
-                AttributeSizeAndName(CommonAttributes.InstanceMesh, instances.Count),
-
-                AttributeSizeAndName(CommonAttributes.ShapeVertex, numShapeVertices),
-                AttributeSizeAndName(CommonAttributes.ShapeVertexOffset, numShapes),
-                AttributeSizeAndName(CommonAttributes.ShapeColor, numShapes),
-                AttributeSizeAndName(CommonAttributes.ShapeWidth, numShapes),
-
-                AttributeSizeAndName(CommonAttributes.MaterialColor, materials.Count),
-                AttributeSizeAndName(CommonAttributes.MaterialGlossiness, materials.Count),
-                AttributeSizeAndName(CommonAttributes.MaterialSmoothness, materials.Count),
-            };
-
-            if (useColors)
-            {
-                writers.Add(AttributeSizeAndName(CommonAttributes.VertexColor, totalVertices));
-            }
-
-            Names = writers.Select(w => w.attribute).ToArray();
-            Sizes = writers.Select(w => w.size).ToArray();
-            Header = BFast.BFast.CreateBFastHeader(Sizes, Names);
-        }
-
-        public long GetSize()
-            => BFast.BFast.ComputeNextAlignment(Header.Preamble.DataEnd);
-
+        /// <summary>
+        /// Writes the G3d to the given stream.
+        /// </summary>
         public void Write(Stream stream)
         {
-            // TODO: validate in debug mode that this is producing the current data model. Look at the schema!
+            var metaBuffer = Header.ToBytes().ToNamedBuffer(Header.SegmentName);
+            var attributes = Attributes.Attributes.Values.OrderBy(n => n.Name).ToArray(); // Order the attributes by name for consistency
 
-            stream.WriteBFastHeader(Header);
-            stream.WriteBFastBody(Header, Names, Sizes, (_stream, index, name, size) =>
+            // Prepare the bfast header, which describes the names and ranges.
+            var (bfastHeader, bufferNames, bufferSizesInBytes) = GetBFastHeaderInfo(Header, attributes);
+
+            // Prepare the stream writers.
+            var streamWriters = new StreamWriter[1 + attributes.Length];
+            streamWriters[0] = s => s.Write(metaBuffer); // First stream writer is the "meta" buffer.
+            for (int i = 0; i < attributes.Length; i++)
+                streamWriters[i + 1] = s => attributes[i].Write(s);
+
+            stream.WriteBFastHeader(bfastHeader);
+            stream.WriteBFastBody(bfastHeader, bufferNames, bufferSizesInBytes, (s, index, name, size) =>
             {
-                switch (name)
-                {
-                    case "meta":
-                        _stream.Write(Meta);
-                        break;
-
-                    // Vertices
-                    case CommonAttributes.Position:
-                        Meshes.ForEach(g => stream.Write(g.Vertices.ToArray()));
-                        break;
-
-                    // Indices
-                    case CommonAttributes.Index:
-                        for (var i = 0; i < Meshes.Count; ++i)
-                        {
-                            var g = Meshes[i];
-                            var offset = MeshVertexOffsets[i];
-                            stream.Write(g.Indices.Select(idx => idx + offset).ToArray());
-                        }
-                        break;
-
-                    // Meshes
-                    case CommonAttributes.MeshSubmeshOffset:
-                        stream.Write(MeshSubmeshOffset);
-                        break;
-
-                    // Instances
-                    case CommonAttributes.InstanceMesh:
-                        stream.Write(Instances.Select(i => i.MeshIndex).ToArray());
-                        break;
-                    case CommonAttributes.InstanceTransform:
-                        stream.Write(Instances.Select(i => i.Transform).ToArray());
-                        break;
-                    case CommonAttributes.InstanceParent:
-                        stream.Write(Instances.Select(i => i.ParentIndex).ToArray());
-                        break;
-
-                    // Shapes
-                    case CommonAttributes.ShapeVertex:
-                        stream.Write(Shapes.SelectMany(s => s.Vertices).ToArray());
-                        break;
-                    case CommonAttributes.ShapeVertexOffset:
-                        stream.Write(ShapeVertexOffsets);
-                        break;
-                    case CommonAttributes.ShapeColor:
-                        stream.Write(Shapes.Select(s => s.Color).ToArray());
-                        break;
-                    case CommonAttributes.ShapeWidth:
-                        stream.Write(Shapes.Select(s => s.Width).ToArray());
-                        break;
-
-                    // Materials
-                    case CommonAttributes.MaterialColor:
-                        stream.Write(Materials.Select(i => i.Color).ToArray());
-                        break;
-                    case CommonAttributes.MaterialGlossiness:
-                        stream.Write(Materials.Select(i => i.Glossiness).ToArray());
-                        break;
-                    case CommonAttributes.MaterialSmoothness:
-                        stream.Write(Materials.Select(i => i.Smoothness).ToArray());
-                        break;
-
-                    // Submeshes
-                    case CommonAttributes.SubmeshIndexOffset:
-                        stream.Write(SubmeshIndexOffsets);
-                        break;
-                    case CommonAttributes.SubmeshMaterial:
-                        stream.Write(Meshes.SelectMany(s => s.SubmeshMaterials).ToArray());
-                        break;
-                    default:
-                        throw new Exception($"Not a recognized geometry buffer: {name}");
-                }
+                streamWriters[index](s);
                 return size;
             });
         }
-    }
-}
-
-         */
     }
 }

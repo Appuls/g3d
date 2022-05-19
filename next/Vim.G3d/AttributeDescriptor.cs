@@ -7,7 +7,7 @@ namespace Vim.G3d
     {
         /// <inhertdoc/>
         public string Name
-            => $"{G3dPrefix}:{Association}:{Semantic}:{IndexStr}:{DataType}:{DataArity}";
+            => string.Join(Separator, G3dPrefix, Association, Semantic, IndexStr, DataType, DataArity);
 
         /// <inhertdoc/>
         public string Association { get; }
@@ -159,19 +159,6 @@ namespace Vim.G3d
         /// </summary>
         public override string ToString()
             => Name;
-
-        // TODO: Convert this to a unit test
-        ///// <summary>
-        ///// Validates the current attribute descriptor. Throws an exception if the validation fails.
-        ///// </summary>
-        //public bool Validate()
-        //{
-        //    var str = ToString();
-        //    var tmp = Parse(str);
-        //    if (!str.Equals(tmp.ToString(), StringComparison.InvariantCulture))
-        //        throw new Exception("Invalid attribute descriptor (or internal error in the parsing/string conversion");
-        //    return true;
-        //}
 
         public static bool TryParse(string str, out AttributeDescriptor attributeDescriptor)
         {

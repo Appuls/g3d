@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Linq;
 using Vim.BFast;
 using Vim.G3d.Attributes;
 
@@ -30,6 +31,19 @@ namespace Vim.G3d.Tests
             Directory.CreateDirectory(testDir);
 
             return testDir;
+        }
+
+        [Test]
+        public static void AttributeDescriptorTest()
+        {
+            var attributeNames = new VimAttributeCollection().AttributeNames;
+            foreach (var name in attributeNames)
+            {
+                // Test that the attribute descriptor parsing works as intended.
+                var parsed = AttributeDescriptor.TryParse(name, out var desc);
+                Assert.IsTrue(parsed);
+                Assert.AreEqual(name, desc.Name);
+            }
         }
 
         [Test]
@@ -68,6 +82,12 @@ namespace Vim.G3d.Tests
             });
 
             Assert.IsNotNull(g3d);
+        }
+
+        [Test]
+        public static void WriteVimTest()
+        {
+            // TODO
         }
     }
 }

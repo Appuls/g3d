@@ -17,4 +17,10 @@ namespace Vim.G3d
     {
         T[] TypedData { get; set; }
     }
+
+    public static class AttributeExtensions
+    {
+        public static long GetSizeInBytes(this IAttribute attribute)
+            => attribute.AttributeDescriptor.DataElementSize * attribute.Data.Length;
+    }
 }

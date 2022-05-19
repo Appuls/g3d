@@ -2,12 +2,11 @@
 
 Code Generation Issue: https://github.com/dotnet/roslyn/issues/49249
 
-- Reader
-    - Vector3/etc array read codegen
-    - Unit tests
 - Writer
-    - Inspire from BigG3dWriter
     - Unit tests
+
+- ORM
+    - Inspire from BigG3dWriter
 
 - Replace Associations.cs/Semantics.cs with documentation
 - Merge/Remap VimAttributeCollection
