@@ -160,6 +160,9 @@ namespace Vim.G3d
         public override string ToString()
             => Name;
 
+        /// <summary>
+        /// Attempts to parse the given string as an AttributeDescriptor.
+        /// </summary>
         public static bool TryParse(string str, out AttributeDescriptor attributeDescriptor)
         {
             attributeDescriptor = null;

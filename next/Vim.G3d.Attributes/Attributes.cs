@@ -1,4 +1,5 @@
-﻿using Vim.Math3d;
+﻿using System.Collections.Generic;
+using Vim.Math3d;
 
 namespace Vim.G3d.Attributes
 {
@@ -36,5 +37,5 @@ namespace Vim.G3d.Attributes
         typeof(ShapeVertexOffsetAttribute),
         typeof(ShapeColorAttribute),
         typeof(ShapeWidthAttribute))]
-    public partial class VimAttributeCollection : AttributeCollection { }
+    public partial class VimAttributeCollection { }
 }

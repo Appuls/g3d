@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Linq;
 using Vim.BFast;
 using Vim.G3d.Attributes;
+using Vim.Math3d;
 
 using static Vim.BFast.BFast;
 
@@ -52,29 +53,28 @@ namespace Vim.G3d.Tests
             var testDir = PrepareTestDir();
             var input = new FileInfo(Path.Combine(TestInputFolder, "unexpected.g3d"));
 
-            var vimAttributeCollection = new VimAttributeCollection();
             using var stream = input.OpenRead();
 
-            var result = G3d.TryRead(stream, vimAttributeCollection, out var g3d);
+            var result = G3d<VimAttributeCollection>.TryRead(stream, out var g3d);
             Assert.IsTrue(result);
 
-            var cornerAttribute = g3d.Attributes.Attributes[IndexAttribute.AttributeName];
+            var cornerAttribute = g3d.AttributeCollection.Attributes[IndexAttribute.AttributeName];
             Assert.IsNotNull(cornerAttribute);
         }
 
         [Test]
-        public static void ReadVimTest()
+        public static void ReadG3dInVimTest()
         {
             var testDir = PrepareTestDir();
             var inputVim = new FileInfo(Path.Combine(TestInputFolder, "Mechanical_Room.r2017.vim"));
 
             using var stream = inputVim.OpenRead();
 
-            G3d? g3d = null;
+            G3d<VimAttributeCollection>? g3d = null;
             stream.ReadBFast<object?>((s, name, size) =>
             {
                 if (name == "geometry")
-                    G3d.TryRead(s, new VimAttributeCollection(), out g3d);
+                    G3d<VimAttributeCollection>.TryRead(s, out g3d);
                 else
                     stream.Seek(size, SeekOrigin.Current);
 
@@ -85,9 +85,44 @@ namespace Vim.G3d.Tests
         }
 
         [Test]
-        public static void WriteVimTest()
+        public static void WriteG3dTest()
         {
-            // TODO
+            var testDir = PrepareTestDir();
+
+            var g3d = new G3d<VimAttributeCollection>();
+            var attrs = g3d.AttributeCollection;
+
+            attrs.CornersPerFaceAttribute.TypedData = new int[] { 3 };
+            attrs.VertexAttribute.TypedData = new Vector3[] { Vector3.Zero, Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ };
+            attrs.IndexAttribute.TypedData = new int[] { 0, 1, 2, 0, 3, 2, 1, 3, 2 };
+            attrs.SubmeshIndexOffsetAttribute.TypedData = new int[] { 0, 3, 6 };
+            attrs.SubmeshMaterialAttribute.TypedData = new int[] { 0, 1, 2 };
+            attrs.MeshSubmeshOffsetAttribute.TypedData = new int[] { 0 };
+            attrs.InstanceTransformAttribute.TypedData = new Matrix4x4[] { Matrix4x4.Identity };
+            attrs.InstanceMeshAttribute.TypedData = new int[] { 0 };
+            attrs.InstanceParentAttribute.TypedData = new int[] { -1 };
+            attrs.MaterialColorAttribute.TypedData = new Vector4[] { new Vector4(0.25f, 0.5f, 0.75f, 1) };
+            attrs.MaterialGlossinessAttribute.TypedData = new float[] { .95f };
+            attrs.MaterialSmoothnessAttribute.TypedData = new float[] { .5f };
+
+            var outputFile = new FileInfo(Path.Combine(testDir!, "test.g3d"));
+            using (var fileStream = outputFile.OpenWrite())
+                g3d.Write(fileStream);
+
+            G3d<VimAttributeCollection>? readG3d = null;
+            using (var fileStream = outputFile.OpenRead())
+            {
+                var readResult = G3d<VimAttributeCollection>.TryRead(fileStream, out readG3d);
+                Assert.IsTrue(readResult);
+            }
+
+            // Compare the buffers.
+            foreach (var attributeName in readG3d.AttributeCollection.AttributeNames)
+            {
+                var attr0 = g3d.AttributeCollection.Attributes[attributeName];
+                var attr1 = readG3d.AttributeCollection.Attributes[attributeName];
+                Assert.AreEqual(attr0.Data, attr1.Data);
+            }
         }
     }
 }

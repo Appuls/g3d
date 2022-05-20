@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
 
 namespace Vim.G3d
@@ -21,6 +19,6 @@ namespace Vim.G3d
     public static class AttributeExtensions
     {
         public static long GetSizeInBytes(this IAttribute attribute)
-            => attribute.AttributeDescriptor.DataElementSize * attribute.Data.Length;
+            => attribute.AttributeDescriptor.DataElementSize * (attribute.Data?.Length ?? 0);
     }
 }

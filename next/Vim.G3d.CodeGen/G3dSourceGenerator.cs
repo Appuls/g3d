@@ -42,6 +42,7 @@ namespace Vim.G3d.CodeGen
 
             // Final source, including using statements and namespace.
             var source = $@"using System;
+using System.Collections.Generic;
 using System.IO;
 using Vim.BFast;
 using Vim.G3d;
@@ -108,17 +109,22 @@ namespace {@namespace}
             => AttributeName;
 
         public static {nameof(AttributeReader)} CreateAttributeReader()
-            => {nameof(AttributeCollection)}.{nameof(AttributeCollection.CreateAttributeReader)}<{className}, {attrType}>();
+            => {nameof(AttributeCollectionExtensions)}.CreateAttributeReader<{className}, {attrType}>();
 
         public {nameof(IAttributeDescriptor)} {nameof(AttributeDescriptor)} {{ get; }}
             = new {nameof(AttributeDescriptor)}(AttributeName);
 
         public {attrType}[] TypedData {{ get; set; }}
+            = Array.Empty<{attrType}>();
 
         public Array Data => TypedData;
 
         public void Write(Stream stream)
-            => stream.Write(TypedData);
+        {{
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }}
     }}";
                 attrSrc.AppendLine(classSrc);
             }
@@ -142,7 +148,7 @@ namespace {@namespace}
         public string GetAttributeCollectionClass(IEnumerable<SyntaxTree> syntaxTrees)
         {
             var collectionClasses = syntaxTrees
-                .GetClassesWithAttribute(nameof(AttributeCollection))
+                .GetClassesWithAttribute("AttributeCollection")
                 .Select(item => (item.Item1, GetArgumentTypes(item.Item2.ArgumentList.Arguments)))
                 .ToArray();
 
@@ -152,12 +158,29 @@ namespace {@namespace}
                 var className = cds.Identifier.ToString();
 
                 attrCollectionSrc.AppendLine(
-$@"    public partial class {className}
+$@"    public partial class {className} : IAttributeCollection
     {{
-        public {className}()
-        {{
-{string.Join(Environment.NewLine, attributeClasses.Select(c => $"            {nameof(AttributeCollection.AttributeReaders)}.Add({c}.AttributeName, {c}.CreateAttributeReader());"))}
-        }}
+        public IEnumerable<string> AttributeNames
+            => Attributes.Keys;
+
+        public IDictionary<string, IAttribute> Attributes {{ get; }}
+            = new Dictionary<string, IAttribute>
+            {{
+{string.Join(Environment.NewLine, attributeClasses.Select(c =>
+$"                [{c}.AttributeName] = new {c}(),"))}
+            }};
+
+        public IDictionary<string, AttributeReader> AttributeReaders {{ get; }}
+            = new Dictionary<string, AttributeReader>
+            {{
+{string.Join(Environment.NewLine, attributeClasses.Select(c =>
+$"                [{c}.AttributeName] = {c}.CreateAttributeReader(),"))}
+            }};
+
+        // Named Attributes.
+{string.Join(Environment.NewLine, attributeClasses.Select(c => $@"
+        public {c} {c}
+            => Attributes.TryGetValue({c}.AttributeName, out var attr) ? attr as {c} : default;"))}
     }}");
             }
 

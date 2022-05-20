@@ -8,7 +8,7 @@ namespace Vim.G3d
     /// <summary>
     /// A G3d is composed of a header and a collection of attributes containing descriptors and their data.
     /// </summary>
-    public class G3d
+    public class G3d<TAttributeCollection> where TAttributeCollection : IAttributeCollection, new()
     {
         /// <summary>
         /// The header of the G3d. Corresponds to the "meta" segment.
@@ -18,31 +18,39 @@ namespace Vim.G3d
         /// <summary>
         /// The attributes of the G3d.
         /// </summary>
-        public readonly AttributeCollection Attributes;
+        public readonly TAttributeCollection AttributeCollection;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public G3d(Header header, AttributeCollection attributes)
+        public G3d(Header header, TAttributeCollection attributeCollection)
         {
             Header = header;
-            Attributes = attributes;
+            AttributeCollection = attributeCollection;
         }
 
         /// <summary>
         /// Constructor. Uses the default header.
         /// </summary>
-        public G3d(AttributeCollection attributes) 
-            : this(Header.Default, attributes)
+        public G3d(TAttributeCollection attributeCollection) 
+            : this(Header.Default, attributeCollection)
+        { }
+
+        /// <summary>
+        /// Constructor. Uses the default header and instantiates an attribute collection.
+        /// </summary>
+        public G3d()
+            : this(Header.Default, new TAttributeCollection())
         { }
 
         /// <summary>
         /// Reads the stream using the attribute collection's readers and outputs a G3d upon success.
         /// </summary>
-        public static bool TryRead(Stream stream, AttributeCollection collection, out G3d g3d)
+        public static bool TryRead(Stream stream, out G3d<TAttributeCollection> g3d)
         {
             g3d = null;
             Header? header = null;
+            var attributeCollection = new TAttributeCollection();
 
             object OnG3dSegment(Stream s, string name, long size)
             {
@@ -53,7 +61,7 @@ namespace Vim.G3d
                 }
 
                 // The segment is not the header so treat it as an attribute.
-                return collection.ReadAttribute(s, name, size);
+                return attributeCollection.ReadAttribute(s, name, size);
             }
 
             _ = stream.ReadBFast(OnG3dSegment);
@@ -63,7 +71,7 @@ namespace Vim.G3d
                 return false;
 
             // Instantiate the object and return.
-            g3d = new G3d(header.Value, collection);
+            g3d = new G3d<TAttributeCollection>(header.Value, attributeCollection);
             return true;
         }
 
@@ -105,7 +113,7 @@ namespace Vim.G3d
         public void Write(Stream stream)
         {
             var metaBuffer = Header.ToBytes().ToNamedBuffer(Header.SegmentName);
-            var attributes = Attributes.Attributes.Values.OrderBy(n => n.Name).ToArray(); // Order the attributes by name for consistency
+            var attributes = AttributeCollection.Attributes.Values.OrderBy(n => n.Name).ToArray(); // Order the attributes by name for consistency
 
             // Prepare the bfast header, which describes the names and ranges.
             var (bfastHeader, bufferNames, bufferSizesInBytes) = GetBFastHeaderInfo(Header, attributes);
@@ -114,7 +122,10 @@ namespace Vim.G3d
             var streamWriters = new StreamWriter[1 + attributes.Length];
             streamWriters[0] = s => s.Write(metaBuffer); // First stream writer is the "meta" buffer.
             for (int i = 0; i < attributes.Length; i++)
-                streamWriters[i + 1] = s => attributes[i].Write(s);
+            {
+                var attr = attributes[i];
+                streamWriters[i + 1] = s => attr.Write(s);
+            }
 
             stream.WriteBFastHeader(bfastHeader);
             stream.WriteBFastBody(bfastHeader, bufferNames, bufferSizesInBytes, (s, index, name, size) =>
