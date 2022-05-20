@@ -26,14 +26,6 @@ namespace Vim.G3d
     public static class DataTypeExtensions
     {
         /// <summary>
-        /// Parses the given string and attempts to return the corresponding data type.
-        /// </summary>
-        public static DataType ParseDataType(this string str, DataType @default = DataType.int8)
-            => Enum.TryParse(str, out DataType dataType)
-                ? dataType
-                : @default;
-
-        /// <summary>
         /// Returns the size in bytes of the given data type.
         /// </summary>
         public static int GetDataTypeSize(this DataType dt)

@@ -37,7 +37,7 @@ namespace Vim.G3d
     }
 
     /// <summary>
-    /// Extension functions and helpers for attributes.
+    /// Extension functions and helpers for attribute collections
     /// </summary>
     public static class AttributeCollectionExtensions
     {
