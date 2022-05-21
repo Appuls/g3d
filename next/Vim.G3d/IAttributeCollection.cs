@@ -12,10 +12,10 @@ namespace Vim.G3d
     /// <summary>
     /// A collection of attributes and readers which can be used to deserialize attributes from a stream.<br/>
     /// <br/>
-    /// A class may inherit from this base class to define the specialized set of attributes and attribute readers for 
+    /// A class may implement this interface to define the specialized set of attributes and attribute readers for 
     /// a given context.<br/>
     /// <br/>
-    /// For example, the geometry and instance information in a VIM file is defined in a subclass of AttributeCollection.
+    /// For example, the geometry and instance information in a VIM file is defined in a class named VimAttributeCollection.
     /// </summary>
     public interface IAttributeCollection
     {
