@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Vim.Math3d;
 
 namespace Vim.G3d.Attributes
@@ -37,5 +38,12 @@ namespace Vim.G3d.Attributes
         typeof(ShapeVertexOffsetAttribute),
         typeof(ShapeColorAttribute),
         typeof(ShapeWidthAttribute))]
-    public partial class VimAttributeCollection { }
+    public partial class VimAttributeCollection
+    {
+        public int NumCornersPerFace
+            => CornersPerFaceAttribute.TypedData?.FirstOrDefault() ?? 0;
+
+        public int NumVertices
+            => VertexAttribute.TypedData?.Length ?? 0;
+    }
 }
