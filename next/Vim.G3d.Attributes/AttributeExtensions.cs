@@ -2,90 +2,201 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using Vim.Math3d;
 
 namespace Vim.G3d.Attributes
 {
     public static class AttributeExtensions
     {
-        /* TODO: IMPLEMENT MERGING LOGIC PER KNOWN ATTRIBUTE
+        /// <summary>
+        /// Merges the given list of VimAttributeCollection into a new VimAttributeCollection.
+        /// </summary>
         public static VimAttributeCollection Merge(this IReadOnlyList<VimAttributeCollection> collections)
         {
             if (collections.Count == 0)
                 return new VimAttributeCollection();
 
             var firstCollection = collections.First();
-
             if (collections.Count == 1)
                 return firstCollection;
 
-            var numCornersPerFace = firstCollection.NumCornersPerFace;
-            if (!collections.All(g => g.NumCornersPerFace == numCornersPerFace))
-                throw new Exception("Cannot merge meshes with different numbers of corners per faces");
+            var result = new VimAttributeCollection();
 
-            // Merge all of the attributes of the different geometries
-            // Except: indices, group indexes, subgeo, and instance attributes
-            var attributes = firstCollection.Attributes.Values.Where(a =>
-            {
-                switch (a)
-                {
-                    case VertexAttribute _:
-                    case SubmeshMaterialAttribute _:
-                        return true;
-                    
+            // Use the first collection's corners per face attribute in the result.
+            result.CornersPerFaceAttribute = firstCollection.CornersPerFaceAttribute;
 
-                    default:
-                        return false;
-                }
-            })
-            .ToList();
-            // OLD:
-            //var attributes = first.VertexAttributes()
-            //    .Concat(first.CornerAttributes())
-            //    .Concat(first.EdgeAttributes())
-            //    .Concat(first.NoneAttributes())
-            //    .Concat(first.FaceAttributes())
-            //    .Append(first.GetAttributeSubmeshMaterial())
-            //    // Skip the index semantic because things get re-ordered
-            //    .Where(attr => attr != null && attr.Descriptor.Semantic != Semantic.Index)
-            //    .ToArray();
+            // Merge the append-only attributes.
+            var mergedAppendOnly = collections.MergeAppendOnlyAttributes();
+            foreach (var mergedAttr in mergedAppendOnly)
+                result.Attributes[mergedAttr.Name] = mergedAttr;
 
-            // Merge the non-indexed attributes
-            var others = collections.Skip(1);
-            var attributeList = attributes.Select(attr =>
-                attr.Merge(others.Select(c =>
-                    c.Attributes.TryGetValue(attr.Name, out var a) ? a : null)
-                .Where(a => a != null)
-                .ToList()));
+            // Merge the indexing attributes.
+            var mergedIndexing = collections.MergeIndexingAttributes();
+            foreach (var mergedAttr in mergedIndexing)
+                result.Attributes[mergedAttr.Name] = mergedAttr;
 
-            // Merge the index attribute
-            // numVertices:               [X],       [Y],             [Z],                   ...
-            // valueOffsets:              [0],       [X],             [X+Y],                 ...
-            // indices:                   [A, B, C], [D,     E,   F], [G,         H,     I], ...
-            // mergedIndices:             [A, B, C], [X+D, X+E, X+F], [X+Y+G, X+Y+H, X+Y+I], ...
-            var mergedIndexAttribute = collections.MergeIndexedAttribute(
-                c => c.IndexAttribute,
-                c => c.NumVertices);
-
-            if (mergedIndexAttribute != null)
-                attributeList.Add(mergedIndexAttribute);
-
-            // Merge the submesh index offset attribute
-            // numCornersPerFace:         [X],       [Y],           [Z],                 ...
-            // valueOffsets:              [0]        [X],           [X+Y],               ...
-            // submeshIndexOffsets:       [0, A, B], [0,   C,   D], [0,       E,     F], ...
-            // mergedSubmeshIndexOffsets: [0, A, B], [X, X+C, X+D], [X+Y, X+Y+E, X+Y+F], ...
-            var mergedSubmeshIndexOffsetAttribute = collections.MergeIndexedAttribute(
-                    c => c.SubmeshIndexOffsetAttribute,
-                    c => c.NumCornersPerFace);
-            if (mergedSubmeshIndexOffsetAttribute != null)
-                attributeList.Add(mergedSubmeshIndexOffsetAttribute);
-
-            return attributeList.ToGeometryAttributes();
+            return result;
         }
-        */
+
+        public static readonly IReadOnlyList<string> AppendOnlyAttributeNames = new[]
+        {
+            VertexAttribute.AttributeName,
+            InstanceTransformAttribute.AttributeName,
+            MaterialColorAttribute.AttributeName,
+            MaterialGlossinessAttribute.AttributeName,
+            MaterialSmoothnessAttribute.AttributeName,
+            ShapeVertexAttribute.AttributeName,
+            ShapeColorAttribute.AttributeName,
+            ShapeWidthAttribute.AttributeName,
+        };
+
+        public static readonly IReadOnlyList<string> IndexingAttributes = new[]
+        {
+            IndexAttribute.AttributeName,
+            InstanceParentAttribute.AttributeName,
+            InstanceMeshAttribute.AttributeName,
+            MeshSubmeshOffsetAttribute.AttributeName,
+            SubmeshIndexOffsetAttribute.AttributeName,
+            SubmeshMaterialAttribute.AttributeName,
+            ShapeVertexOffsetAttribute.AttributeName,
+        };
 
         /// <summary>
-        /// Merges the attributes based on the given transformations and returns an array of merged values.
+        /// Returns a grouping of the attributes by name.
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<IGrouping<string, (int CollectionIndex, IAttribute Attribute)>> GetGroupedAttributesByName(
+            this IReadOnlyList<VimAttributeCollection> collections,
+            IReadOnlyList<string> attributeNames)
+        {
+            var attributeNameSet = new HashSet<string>(attributeNames);
+
+            return collections
+                .SelectMany((collection, collectionIndex) => collection.Attributes.Values
+                    .Where(attr => attributeNameSet.Contains(attr.Name))
+                    .Select(attr => (collectionIndex, attr)))
+                .GroupBy(t => t.attr.Name);
+        }
+
+        /// <summary>
+        /// Merge the append-only attributes contained in the collections.
+        /// </summary>
+        public static IEnumerable<IAttribute> MergeAppendOnlyAttributes(this IReadOnlyList<VimAttributeCollection> collections)
+        {
+            var result = new List<IAttribute>();
+
+            var groupedAttributes = collections.GetGroupedAttributesByName(AppendOnlyAttributeNames);
+            foreach (var group in groupedAttributes)
+            {
+                var attributeName = group.Key;
+                var attributes = group.OrderBy(t => t.CollectionIndex);
+
+                IAttribute merged = null;
+                switch (attributeName)
+                {
+                    case VertexAttribute.AttributeName:
+                        merged = attributes.OfType<VertexAttribute>().ToList().MergeAppendOnlyAttributes<VertexAttribute, Vector3>();
+                        break;
+                    case InstanceTransformAttribute.AttributeName:
+                        merged = attributes.OfType<InstanceTransformAttribute>().ToList().MergeAppendOnlyAttributes<InstanceTransformAttribute, Matrix4x4>();
+                        break;
+                    case MaterialColorAttribute.AttributeName:
+                        merged = attributes.OfType<MaterialColorAttribute>().ToList().MergeAppendOnlyAttributes<MaterialColorAttribute, Vector4>();
+                        break;
+                    case MaterialGlossinessAttribute.AttributeName:
+                        merged = attributes.OfType<MaterialGlossinessAttribute>().ToList().MergeAppendOnlyAttributes<MaterialGlossinessAttribute, float>();
+                        break;
+                    case MaterialSmoothnessAttribute.AttributeName:
+                        merged = attributes.OfType<MaterialSmoothnessAttribute>().ToList().MergeAppendOnlyAttributes<MaterialSmoothnessAttribute, float>();
+                        break;
+                    case ShapeVertexAttribute.AttributeName:
+                        merged = attributes.OfType<ShapeVertexAttribute>().ToList().MergeAppendOnlyAttributes<ShapeVertexAttribute, Vector3>();
+                        break;
+                    case ShapeColorAttribute.AttributeName:
+                        merged = attributes.OfType<ShapeColorAttribute>().ToList().MergeAppendOnlyAttributes<ShapeColorAttribute, Vector4>();
+                        break;
+                    case ShapeWidthAttribute.AttributeName:
+                        merged = attributes.OfType<ShapeWidthAttribute>().ToList().MergeAppendOnlyAttributes<ShapeWidthAttribute, float>();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("No merge case found for append-only attribute", nameof(attributeName));
+                }
+                result.Add(merged);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Merges the append-only attributes.
+        /// </summary>
+        public static TAttr MergeAppendOnlyAttributes<TAttr, U>(this IReadOnlyList<TAttr> attributes) where TAttr : IAttribute<U>, new()
+        {
+            if (attributes.Count == 0)
+                return new TAttr();
+
+            // Check that all attributes have the same descriptor 
+            var first = attributes.First();
+            if (!attributes.All(attr => attr.Name.Equals(first.Name)))
+                throw new Exception($"All attributes must have the same descriptor ({first.Name}) to be merged.");
+
+            var data = attributes.SelectMany(attr => attr.TypedData).ToArray();
+            return new TAttr { TypedData = data };
+        }
+
+        /// <summary>
+        /// Merges the indexing attributes in the collection.
+        /// </summary>
+        public static IEnumerable<IAttribute> MergeIndexingAttributes(this IReadOnlyList<VimAttributeCollection> collections)
+        {
+            var result = new List<IAttribute>();
+
+            foreach (var attributeName in IndexingAttributes)
+            {
+                IAttribute merged = null;
+                switch (attributeName)
+                {
+                    case IndexAttribute.AttributeName:
+                        // Merge the index attribute
+                        // numVertices:               [X],       [Y],             [Z],                   ...
+                        // valueOffsets:              [0],       [X],             [X+Y],                 ...
+                        // indices:                   [A, B, C], [D,     E,   F], [G,         H,     I], ...
+                        // mergedIndices:             [A, B, C], [X+D, X+E, X+F], [X+Y+G, X+Y+H, X+Y+I], ...
+                        merged = collections.MergeIndexingAttribute(c => c.IndexAttribute, c => c.NumVertices);
+                        break;
+                    case InstanceParentAttribute.AttributeName:
+                        throw new NotImplementedException();
+                        break;
+                    case InstanceMeshAttribute.AttributeName:
+                        throw new NotImplementedException(); // TODO: IMPLEMENT ME
+                        break;
+                    case MeshSubmeshOffsetAttribute.AttributeName:
+                        throw new NotImplementedException(); // TODO: IMPLEMENT ME
+                        break;
+                    case SubmeshIndexOffsetAttribute.AttributeName:
+                        // numCorners:                [X],       [Y],           [Z],                 ...
+                        // valueOffsets:              [0]        [X],           [X+Y],               ...
+                        // submeshIndexOffsets:       [0, A, B], [0,   C,   D], [0,       E,     F], ...
+                        // mergedSubmeshIndexOffsets: [0, A, B], [X, X+C, X+D], [X+Y, X+Y+E, X+Y+F], ...
+                        merged = collections.MergeIndexingAttribute(c => c.SubmeshIndexOffsetAttribute, c => c.NumCorners);
+                        break;
+                    case SubmeshMaterialAttribute.AttributeName:
+                        throw new NotImplementedException(); // TODO: IMPLEMENT ME
+                        break;
+                    case ShapeVertexOffsetAttribute.AttributeName:
+                        throw new NotImplementedException(); // TODO: IMPLEMENT ME
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("No merge case found for indexing attribute", nameof(attributeName));
+                }
+                result.Add(merged);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Merges the attributes based on the given transformations.
         /// </summary>
         public static TAttr MergeAttributes<TAttr, U>(
             this IReadOnlyList<VimAttributeCollection> collections,
@@ -107,7 +218,7 @@ namespace Vim.G3d.Attributes
         /// <summary>
         /// Merges the indexed attributes.
         /// </summary>
-        public static TAttr MergeIndexedAttribute<TAttr>(
+        public static TAttr MergeIndexingAttribute<TAttr>(
             this IReadOnlyList<VimAttributeCollection> collections,
             Func<VimAttributeCollection, TAttr> getIndexedAttributeFunc,
             Func<VimAttributeCollection, int> getValueOffsetFunc,
@@ -144,32 +255,6 @@ namespace Vim.G3d.Attributes
 
                     return new TAttr { TypedData = mergedData };
                 });
-        }
-
-        public static TAttr MergeAttributes<TAttr, U>(this IReadOnlyList<TAttr> attributes)
-            where TAttr : IAttribute<U>, new()
-        {
-            // TODO: Improve this precondition
-            var t = typeof(TAttr);
-            if (t == typeof(IndexAttribute) ||
-                t == typeof(MeshSubmeshOffsetAttribute) ||
-                t == typeof(InstanceMeshAttribute) ||
-                t == typeof(InstanceParentAttribute) ||
-                t == typeof(InstanceTransformAttribute))
-            {
-                throw new ArgumentException($"Unable to merge attributes of type {typeof(TAttr)}");
-            }
-
-            if (attributes.Count == 0)
-                return new TAttr();
-
-            // Check that all attributes have the same descriptor 
-            var first = attributes.First();
-            if (!attributes.All(attr => attr.Name.Equals(first.Name)))
-                throw new Exception($"All attributes must have the same descriptor ({first.Name}) to be merged.");
-
-            var data = attributes.SelectMany(attr => attr.TypedData).ToArray();
-            return new TAttr { TypedData = data };
         }
     }
 }

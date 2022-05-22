@@ -174,7 +174,11 @@ $"                [{c}.AttributeName] = {c}.CreateAttributeReader(),"))}
         // Named Attributes.
 {string.Join(Environment.NewLine, attributeClasses.Select(c => $@"
         public {c} {c}
-            => Attributes.TryGetValue({c}.AttributeName, out var attr) ? attr as {c} : default;"))}
+        {{
+            get => Attributes.TryGetValue({c}.AttributeName, out var attr) ? attr as {c} : default;
+            set => Attributes[{c}.AttributeName] = value as IAttribute;
+        }}"))}
+            
     }}");
             }
 

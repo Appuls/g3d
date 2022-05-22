@@ -40,9 +40,21 @@ namespace Vim.G3d.Attributes
         typeof(ShapeWidthAttribute))]
     public partial class VimAttributeCollection
     {
+        /// <summary>
+        /// The number of corners per face. A value of 3 designates that all faces are triangles (a triangle has 3 corners).
+        /// </summary>
         public int NumCornersPerFace
             => CornersPerFaceAttribute.TypedData?.FirstOrDefault() ?? 0;
 
+        /// <summary>
+        /// The total number of face corners
+        /// </summary>
+        public int NumCorners
+            => IndexAttribute.TypedData?.Length ?? 0;
+
+        /// <summary>
+        /// The total number of vertices.
+        /// </summary>
         public int NumVertices
             => VertexAttribute.TypedData?.Length ?? 0;
     }
