@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Vim.BFast;
 using System.Linq;
 using System.Collections.Generic;
@@ -69,6 +70,17 @@ namespace Vim.G3d
             // Failure case if the header was not found.
             if (!header.HasValue)
                 return false;
+
+            try
+            {
+                // Validate the attribute collection. This may throw an exception.
+                attributeCollection.Validate();
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.Fail(e.Message, e.StackTrace);
+                return false;
+            }
 
             // Instantiate the object and return.
             g3d = new G3d<TAttributeCollection>(header.Value, attributeCollection);

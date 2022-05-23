@@ -34,6 +34,11 @@ namespace Vim.G3d
         /// A mapping from attribute name to its corresponding attribute reader.
         /// </summary>
         IDictionary<string, AttributeReader> AttributeReaders { get; }
+
+        /// <summary>
+        /// Validates the attribute collection. May throw an exception if the collection is invalid.
+        /// </summary>
+        void Validate();
     }
 
     /// <summary>

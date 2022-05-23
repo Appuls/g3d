@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Vim.Math3d;
 
@@ -38,42 +39,70 @@ namespace Vim.G3d.Attributes
         typeof(ShapeVertexOffsetAttribute),
         typeof(ShapeColorAttribute),
         typeof(ShapeWidthAttribute))]
-    public partial class VimAttributeCollection
+    public partial class VimAttributeCollection : IAttributeCollection
     {
+        // -- Counts --
+
         /// <summary>
         /// The number of corners per face. A value of 3 designates that all faces are triangles (a triangle has 3 corners).
         /// </summary>
         public int NumCornersPerFace
-            => CornersPerFaceAttribute.TypedData?.FirstOrDefault() ?? 0;
+            => CornersPerFaceAttribute?.TypedData?.First() ?? 0;
 
         /// <summary>
-        /// The total number of face corners
+        /// The total number of indices.
         /// </summary>
         public int NumIndices
-            => IndexAttribute.TypedData?.Length ?? 0;
+            => IndexAttribute?.TypedData?.Length ?? 0;
 
         /// <summary>
         /// The total number of vertices.
         /// </summary>
         public int NumVertices
-            => VertexAttribute.TypedData?.Length ?? 0;
+            => VertexAttribute?.TypedData?.Length ?? 0;
 
         /// <summary>
         /// The total number of instances.
         /// </summary>
         public int NumInstances
-            => InstanceTransformAttribute.TypedData?.Length ?? 0;
+            => InstanceTransformAttribute?.TypedData?.Length ?? 0;
 
         /// <summary>
         /// The total number of meshes.
         /// </summary>
         public int NumMeshes
-            => MeshSubmeshOffsetAttribute.TypedData?.Length ?? 0;
+            => MeshSubmeshOffsetAttribute?.TypedData?.Length ?? 0;
 
         /// <summary>
         /// The total number of submeshes.
         /// </summary>
         public int NumSubmeshes
-            => SubmeshIndexOffsetAttribute.TypedData?.Length ?? 0;
+            => SubmeshIndexOffsetAttribute?.TypedData?.Length ?? 0;
+
+        /// <summary>
+        /// The total number of materials.
+        /// </summary>
+        public int NumMaterials
+            => MaterialColorAttribute?.TypedData?.Length ?? 0;
+
+        /// <summary>
+        /// The total number of shape vertices.
+        /// </summary>
+        public int NumShapeVertices
+            => ShapeVertexAttribute?.TypedData?.Length ?? 0;
+
+        /// <summary>
+        /// The total number of shapes.
+        /// </summary>
+        public int NumShapes
+            => ShapeVertexOffsetAttribute?.TypedData?.Length ?? 0;
+
+        // -- Computed Indices and Counts --
+
+        public void Validate()
+        {
+            // TODO: validate the multiplicity of all attributes.
+            throw new NotImplementedException();
+        }
     }
 }

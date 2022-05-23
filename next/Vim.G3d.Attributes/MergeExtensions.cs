@@ -1,29 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using Vim.Math3d;
 
 namespace Vim.G3d.Attributes
 {
-    public static class AttributeExtensions
+    public static class MergeExtensions
     {
         /// <summary>
-        /// Merges the given list of VimAttributeCollection into a new VimAttributeCollection.
+        /// Merges the given list of G3ds.<br/>
+        /// - If there is no g3d, returns a new empty g3d.<br/>
+        /// - If there is only one g3d, returns that g3d.
+        /// </summary>
+        public static G3d<VimAttributeCollection> Merge(this IReadOnlyCollection<G3d<VimAttributeCollection>> g3ds)
+        {
+            switch (g3ds.Count)
+            {
+                case 0:
+                    return new G3d<VimAttributeCollection>();
+                case 1:
+                    return g3ds.First();
+                default:
+                    return new G3d<VimAttributeCollection>(g3ds.Select(g => g.AttributeCollection).ToList().Merge());
+            }
+        }
+
+        /// <summary>
+        /// Merges the given list of VimAttributeCollection.<br/>
+        /// - If there is no collection, returns a new empty VimAttributeCollection.<br/>
+        /// - If there is only one collection, returns that collection.
         /// </summary>
         public static VimAttributeCollection Merge(this IReadOnlyList<VimAttributeCollection> collections)
         {
-            if (collections.Count == 0)
-                return new VimAttributeCollection();
+            switch (collections.Count)
+            {
+                case 0:
+                    return new VimAttributeCollection();
+                case 1:
+                    return collections.First();
+                default:
+                    break;
+            }
 
             var firstCollection = collections.First();
-            if (collections.Count == 1)
-                return firstCollection;
-
             var result = new VimAttributeCollection();
 
             // Use the first collection's corners per face attribute in the result.
-            result.CornersPerFaceAttribute = firstCollection.CornersPerFaceAttribute;
+            foreach (var attributeName in AllScopedAttributeNames)
+                result.Attributes[attributeName] = firstCollection.Attributes[attributeName];
 
             // Merge the append-only attributes.
             var mergedAppendOnly = collections.MergeAppendOnlyAttributes();
@@ -37,6 +61,11 @@ namespace Vim.G3d.Attributes
 
             return result;
         }
+
+        public static readonly IReadOnlyList<string> AllScopedAttributeNames = new[]
+        {
+            CornersPerFaceAttribute.AttributeName,
+        };
 
         public static readonly IReadOnlyList<string> AppendOnlyAttributeNames = new[]
         {
@@ -185,17 +214,25 @@ namespace Vim.G3d.Attributes
                         merged = collections.MergeIndexingAttribute(c => c.MeshSubmeshOffsetAttribute, c => c.NumSubmeshes);
                         break;
                     case SubmeshIndexOffsetAttribute.AttributeName:
-                        // numIndices:                [X],       [Y],           [Z],                 ...
-                        // valueOffsets:              [0]        [X],           [X+Y],               ...
-                        // submeshIndexOffsets:       [0, A, B], [0,   C,   D], [0,       E,     F], ...
-                        // mergedSubmeshIndexOffsets: [0, A, B], [X, X+C, X+D], [X+Y, X+Y+E, X+Y+F], ...
+                        // numIndices:                [X],       [Y],             [Z],                   ...
+                        // valueOffsets:              [0],       [X],             [X+Y],                 ...
+                        // submeshIndexOffsets:       [A, B, C], [D,     E,   F], [G,         H,     I], ...
+                        // mergedSubmeshIndexOffsets: [A, B, C], [X+D, X+E, X+F], [X+Y+G, X+Y+H, X+Y+I], ...
                         merged = collections.MergeIndexingAttribute(c => c.SubmeshIndexOffsetAttribute, c => c.NumIndices);
                         break;
                     case SubmeshMaterialAttribute.AttributeName:
-                        throw new NotImplementedException(); // TODO: IMPLEMENT ME
+                        // numMaterials:              [X],       [Y],             [Z],                   ...
+                        // valueOffsets:              [0],       [X],             [X+Y],                 ...
+                        // submeshMaterials:          [A, B, C], [D,     E,   F], [G,         H,     I], ...
+                        // mergedSubmeshMaterials:    [A, B, C], [X+D, X+E, X+F], [X+Y+G, X+Y+H, X+Y+I], ...
+                        merged = collections.MergeIndexingAttribute(c => c.SubmeshMaterialAttribute, c => c.NumMaterials);
                         break;
                     case ShapeVertexOffsetAttribute.AttributeName:
-                        throw new NotImplementedException(); // TODO: IMPLEMENT ME
+                        // numShapeVertices:          [X],       [Y],             [Z],                   ...
+                        // valueOffsets:              [0],       [X],             [X+Y],                 ...
+                        // shapeVertexOffsets:        [A, B, C], [D,     E,   F], [G,         H,     I], ...
+                        // mergedShapeVertexOffsets:  [A, B, C], [X+D, X+E, X+F], [X+Y+G, X+Y+H, X+Y+I], ...
+                        merged = collections.MergeIndexingAttribute(c => c.ShapeVertexOffsetAttribute, c => c.NumShapeVertices);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("No merge case found for indexing attribute", nameof(attributeName));
