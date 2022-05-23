@@ -49,7 +49,7 @@ namespace Vim.G3d.Attributes
         /// <summary>
         /// The total number of face corners
         /// </summary>
-        public int NumCorners
+        public int NumIndices
             => IndexAttribute.TypedData?.Length ?? 0;
 
         /// <summary>
@@ -57,5 +57,23 @@ namespace Vim.G3d.Attributes
         /// </summary>
         public int NumVertices
             => VertexAttribute.TypedData?.Length ?? 0;
+
+        /// <summary>
+        /// The total number of instances.
+        /// </summary>
+        public int NumInstances
+            => InstanceTransformAttribute.TypedData?.Length ?? 0;
+
+        /// <summary>
+        /// The total number of meshes.
+        /// </summary>
+        public int NumMeshes
+            => MeshSubmeshOffsetAttribute.TypedData?.Length ?? 0;
+
+        /// <summary>
+        /// The total number of submeshes.
+        /// </summary>
+        public int NumSubmeshes
+            => SubmeshIndexOffsetAttribute.TypedData?.Length ?? 0;
     }
 }
