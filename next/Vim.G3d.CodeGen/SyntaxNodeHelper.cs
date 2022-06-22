@@ -46,9 +46,10 @@ namespace Vim.G3d.CodeGen
             }
         }
 
-        public static IEnumerable<(ClassDeclarationSyntax ClassDeclarationSyntax, AttributeSyntax AttributeSyntax)> GetClassesWithAttribute(
-            this IEnumerable<SyntaxTree> syntaxTrees,
-            string attributeName)
+        public static IEnumerable<(ClassDeclarationSyntax ClassDeclarationSyntax, AttributeSyntax AttributeSyntax)>
+            GetClassesWithAttribute(
+                this IEnumerable<SyntaxTree> syntaxTrees,
+                string attributeName)
         {
             var classDeclarationSyntaxes = syntaxTrees
                 .SelectMany(st => st.GetRoot().DescendantNodes()
@@ -84,6 +85,30 @@ namespace Vim.G3d.CodeGen
 
             var match = TypeofRegex.Match(str);
             return match.Success ? match.Groups[1].Value : null;
+        }
+
+        public static bool TryGetOptionalArgValue(string str, string argName, out string argValue)
+        {
+            argValue = default;
+
+            var tokens = str.Split('=').Select(s => s.Trim()).ToArray();
+
+            if (tokens.Length < 2 || tokens[0] != argName)
+                return false;
+
+            argValue = tokens[1];
+            return true;
+        }
+
+        public static bool TryGetOptionalArgValue(this IEnumerable<string> strs, string argName, out string argValue)
+        {
+            argValue = default;
+
+            var candidate = strs.FirstOrDefault(s => s.StartsWith(argName));
+            if (candidate == default)
+                return false;
+
+            return TryGetOptionalArgValue(candidate, argName, out argValue);
         }
     }
 }

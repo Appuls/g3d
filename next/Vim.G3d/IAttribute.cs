@@ -7,6 +7,8 @@ namespace Vim.G3d
     {
         string Name { get; }
         IAttributeDescriptor AttributeDescriptor { get; }
+        AttributeType AttributeType { get; }
+        Type IndexInto { get; }
         Array Data { get; }
         void Write(Stream stream);
     }

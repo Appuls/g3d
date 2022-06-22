@@ -1,19 +1,21 @@
 ﻿using System;
+using System.Linq.Expressions;
 
 namespace Vim.G3d
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class AttributeDescriptorAttribute : Attribute
     {
-        private readonly string _name;
-        private readonly Type _arrayType;
+        public string Name { get; set; }
+        public Type ArrayType { get; set; } = null;
+        public AttributeType AttributeType { get; set; } = AttributeType.Data;
+        public Type IndexInto { get; set; } = null;
 
-        public AttributeDescriptorAttribute(string name, Type arrayType)
-            => (_name, _arrayType) = (name, arrayType);
-
-        public AttributeDescriptorAttribute(string name)
-            : this(name, null)
-        { }
+        public AttributeDescriptorAttribute(string name, AttributeType attributeType)
+        {
+            Name = name;
+            AttributeType = attributeType;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Class)]

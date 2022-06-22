@@ -124,5 +124,16 @@ namespace Vim.G3d.Tests
                 Assert.AreEqual(attr0.Data, attr1.Data);
             }
         }
+
+        [Test]
+        public static void MergeG3dTest()
+        {
+            var testDir = PrepareTestDir();
+
+            var g3d = new G3d<VimAttributeCollection>();
+            var attrs = g3d.AttributeCollection;
+
+            // TODO: test attribute merging.
+        }
     }
 }

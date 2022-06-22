@@ -1,6 +1,7 @@
 //# define DEBUG_SOURCE_GENERATOR
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -30,9 +31,9 @@ namespace Vim.G3d.CodeGen
         {
             var syntaxTrees = context.Compilation.SyntaxTrees;
 
-            var (@namespace, attributeSrc) = GetAttributeClassesAndNamespace(syntaxTrees);
+            var (@namespace, attributeSrc, metaAttributes) = GetAttributeClassesAndNamespace(syntaxTrees);
 
-            var attributeCollectionSrc = GetAttributeCollectionClass(syntaxTrees);
+            var attributeCollectionSrc = GetAttributeCollectionClass(syntaxTrees, metaAttributes);
 
             // Final source, including using statements and namespace.
             var source = $@"using System;
@@ -56,32 +57,31 @@ namespace {@namespace}
         /// <summary>
         /// Returns the source code which implement the attribute buffers.
         /// </summary>
-        public (string Namespace, string AttributeSrc) GetAttributeClassesAndNamespace(IEnumerable<SyntaxTree> syntaxTrees)
+        public (string Namespace, string AttributeSrc, MetaAttribute[] MetaAttributes) GetAttributeClassesAndNamespace(IEnumerable<SyntaxTree> syntaxTrees)
         {
-            var bufferClasses = syntaxTrees
+            var metaAttributes = syntaxTrees
                 .GetClassesWithAttribute(nameof(AttributeDescriptor))
-                .Select(item =>
-                {
-                    var args = item.Item2.ArgumentList.Arguments.ToArray();
-                    var arg0 = args[0].ToString().Trim('"'); // mandatory argument
-                    var arg1 = args.Length > 1 ? SyntaxNodeHelper.TypeofArg(args[1].ToString()) : null; // type argument
-                    return (item.ClassDeclarationSyntax, AttrName: arg0, ArrayType: arg1);
-                })
+                .Select(item => new MetaAttribute(item.Item1, item.Item2))
                 .ToArray();
 
-            if (bufferClasses.Length == 0)
+            if (metaAttributes.Length == 0)
                 return default;
 
             // Collect the namespace.
-            if (!SyntaxNodeHelper.TryGetParentSyntax<NamespaceDeclarationSyntax>(bufferClasses.First().Item1, out var namespaceSyntax))
+            if (!SyntaxNodeHelper.TryGetParentSyntax<NamespaceDeclarationSyntax>(metaAttributes.First().ClassDeclarationSyntax, out var namespaceSyntax))
                 throw new Exception("Namespace not found.");
             var @namespace = namespaceSyntax.Name.ToString();
 
             // Generate the code for each class.
             var attrSrc = new StringBuilder();
-            foreach (var (cds, attrName, arrayType) in bufferClasses)
+            foreach (var ma in metaAttributes)
             {
-                var className = cds.Identifier.ToString();
+                var attrName = ma.AttributeNameArg;
+                var attrType = ma.AttributeTypeArg;
+                var arrayType = ma.ArrayTypeArg;
+                var indexInto = ma.IndexIntoArg;
+
+                var className = ma.ClassName;
 
                 var attr = new AttributeDescriptor(attrName);
                 if (attr.HasErrors)
@@ -90,12 +90,12 @@ namespace {@namespace}
                     continue;
                 }
 
-                var attrType = !string.IsNullOrEmpty(arrayType)
+                var typedDataType = !string.IsNullOrEmpty(arrayType)
                     ? arrayType
                     : attr.DataType.GetManagedType().ToString();
 
                 var classSrc = $@"
-    public partial class {className} : {nameof(IAttribute)}<{attrType}>
+    public partial class {className} : {nameof(IAttribute)}<{typedDataType}>
     {{
         public const string AttributeName = ""{attrName}"";
 
@@ -103,13 +103,19 @@ namespace {@namespace}
             => AttributeName;
 
         public static {nameof(AttributeReader)} CreateAttributeReader()
-            => {nameof(AttributeCollectionExtensions)}.CreateAttributeReader<{className}, {attrType}>();
+            => {nameof(AttributeCollectionExtensions)}.CreateAttributeReader<{className}, {typedDataType}>();
 
         public {nameof(IAttributeDescriptor)} {nameof(AttributeDescriptor)} {{ get; }}
             = new {nameof(AttributeDescriptor)}(AttributeName);
 
-        public {attrType}[] TypedData {{ get; set; }}
-            = Array.Empty<{attrType}>();
+        public {nameof(AttributeType)} {nameof(IAttribute.AttributeType)} {{ get; }}
+            = {attrType};
+
+        public Type {nameof(IAttribute.IndexInto)} {{ get; }}
+            = {(indexInto == default ? "null" : $"typeof({indexInto})")};
+
+        public {typedDataType}[] TypedData {{ get; set; }}
+            = Array.Empty<{typedDataType}>();
 
         public Array Data => TypedData;
 
@@ -123,7 +129,7 @@ namespace {@namespace}
                 attrSrc.AppendLine(classSrc);
             }
 
-            return (@namespace, attrSrc.ToString());
+            return (@namespace, attrSrc.ToString(), metaAttributes);
         }
 
         private readonly Regex typeofRegex = new Regex(@"\s*typeof\(([a-zA-Z0-9-_.]+)\)\s*");
@@ -139,7 +145,7 @@ namespace {@namespace}
                 .ToArray();
         }
 
-        public string GetAttributeCollectionClass(IEnumerable<SyntaxTree> syntaxTrees)
+        public string GetAttributeCollectionClass(IEnumerable<SyntaxTree> syntaxTrees, MetaAttribute[] metaAttributes)
         {
             var collectionClasses = syntaxTrees
                 .GetClassesWithAttribute("AttributeCollection")
@@ -178,7 +184,16 @@ $"                [{c}.AttributeName] = {c}.CreateAttributeReader(),"))}
             get => Attributes.TryGetValue({c}.AttributeName, out var attr) ? attr as {c} : default;
             set => Attributes[{c}.AttributeName] = value as IAttribute;
         }}"))}
-            
+
+        /// <inheritdoc/>
+        public IAttribute GetAttribute(Type attributeType)
+        {{
+{string.Join(Environment.NewLine, attributeClasses.Select(c => $@"
+            if (attributeType == typeof({c}))
+                return {c};"))}
+
+            throw new ArgumentException(""Type {{attributeType.ToString()}} is not supported."");
+        }}
     }}");
             }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Vim.BFast;
 
@@ -39,6 +40,11 @@ namespace Vim.G3d
         /// Validates the attribute collection. May throw an exception if the collection is invalid.
         /// </summary>
         void Validate();
+
+        /// <summary>
+        /// Returns the attribute corresponding to the given type.
+        /// </summary>
+        IAttribute GetAttribute(Type attributeType);
     }
 
     /// <summary>
