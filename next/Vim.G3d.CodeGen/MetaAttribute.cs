@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -34,5 +31,21 @@ namespace Vim.G3d.CodeGen
             if (args.TryGetOptionalArgValue(nameof(AttributeDescriptorAttribute.IndexInto), out var indexIntoArg))
                 IndexIntoArg = SyntaxNodeHelper.TypeofArg(indexIntoArg);
         }
+
+        public AttributeType AttributeType
+            => Enum.TryParse<AttributeType>(AttributeTypeArg.Replace($"{nameof(AttributeType)}.", ""), out var val)
+            ? val
+            : throw new Exception("Could not parse attribute type arg");
+
+        public string GetTypedDataType()
+        {
+            if (!string.IsNullOrEmpty(ArrayTypeArg))
+                return ArrayTypeArg;
+
+            if (!AttributeDescriptor.TryParse(AttributeNameArg, out var attr))
+                throw new Exception("Could not parse attribute name arg");
+
+            return attr.DataType.GetManagedType().ToString();
+        } 
     }
 }

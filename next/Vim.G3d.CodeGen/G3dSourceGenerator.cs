@@ -39,6 +39,7 @@ namespace Vim.G3d.CodeGen
             var source = $@"using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Vim.BFast;
 using Vim.G3d;
 using Vim.Math3d;
@@ -76,23 +77,11 @@ namespace {@namespace}
             var attrSrc = new StringBuilder();
             foreach (var ma in metaAttributes)
             {
+                var className = ma.ClassName;
                 var attrName = ma.AttributeNameArg;
                 var attrType = ma.AttributeTypeArg;
-                var arrayType = ma.ArrayTypeArg;
+                var typedDataType = ma.GetTypedDataType();
                 var indexInto = ma.IndexIntoArg;
-
-                var className = ma.ClassName;
-
-                var attr = new AttributeDescriptor(attrName);
-                if (attr.HasErrors)
-                {
-                    attrSrc.AppendLine($"(ERROR_{attr.Errors:G}, \"{attrName}\")");
-                    continue;
-                }
-
-                var typedDataType = !string.IsNullOrEmpty(arrayType)
-                    ? arrayType
-                    : attr.DataType.GetManagedType().ToString();
 
                 var classSrc = $@"
     public partial class {className} : {nameof(IAttribute)}<{typedDataType}>
@@ -193,6 +182,44 @@ $"                [{c}.AttributeName] = {c}.CreateAttributeReader(),"))}
                 return {c};"))}
 
             throw new ArgumentException(""Type {{attributeType.ToString()}} is not supported."");
+        }}
+
+        public IAttribute MergeAttribute(string attributeName, IReadOnlyList<IAttributeCollection> otherCollections)
+        {{
+            var collections = otherCollections.Prepend(this).ToArray();
+            switch (attributeName)
+            {{
+{string.Join(Environment.NewLine, attributeClasses.Select(c => {
+    var metaAttribute = metaAttributes.Single(ma => ma.ClassName == c);
+    var typedDataType = metaAttribute.GetTypedDataType();
+    string caseBody = null;
+    switch (metaAttribute.AttributeType)
+    {
+        case AttributeType.Singleton:
+            caseBody = $@"// Singleton Attribute
+                    return {c};";
+            break;
+        case AttributeType.Data:
+            caseBody = $@"// Data Attribute
+                    return collections.GetAttributesOfType<{c}>().ToArray().MergeDataAttributes<{c}, {typedDataType}>();";
+            break;
+        case AttributeType.Index:
+            caseBody = $@"// Index Attribute
+                    return collections.GetIndexedAttributesOfType<{c}>().MergeIndexAttributes();";
+            break;
+        default:
+            throw new ArgumentOutOfRangeException(nameof(metaAttribute.AttributeType));
+    }
+
+    return $@"
+                case {c}.AttributeName:
+                {{
+                    {caseBody}
+                }}"; }))}
+
+                default:
+                    throw new ArgumentException(nameof(attributeName));
+            }}
         }}
     }}");
             }
