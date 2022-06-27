@@ -88,6 +88,17 @@ namespace Vim.G3d
         }
 
         /// <summary>
+        /// Reads the g3d from the given file path. Returns true if the g3d was successfully read.
+        /// </summary>
+        public static bool TryRead(string filePath, out G3d<TAttributeCollection> g3d)
+        {
+            using (var fileStream = new FileInfo(filePath).OpenRead())
+            {
+                return TryRead(fileStream, out g3d);
+            }
+        }
+
+        /// <summary>
         /// Returns the G3d BFast header information, including buffer names and buffer sizes in bytes.
         /// </summary>
         private static (BFastHeader BFastHeader, string[] BufferNames, long[] BufferSizesInBytes ) GetBFastHeaderInfo(
@@ -146,5 +157,24 @@ namespace Vim.G3d
                 return size;
             });
         }
+
+        /// <summary>
+        /// Writes teh G3d to the given file path.
+        /// </summary>
+        public void Write(string filePath)
+        {
+            var dir = Path.GetDirectoryName(filePath);
+            if (dir != null && !Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            using (var fileStream = new FileInfo(filePath).OpenWrite())
+                Write(fileStream);
+        }
+
+        /// <summary>
+        /// Validates the G3d.
+        /// </summary>
+        public void Validate()
+            => AttributeCollection.Validate();
     }
 }

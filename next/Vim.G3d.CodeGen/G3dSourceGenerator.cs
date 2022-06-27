@@ -196,16 +196,16 @@ $"                [{c}.AttributeName] = {c}.CreateAttributeReader(),"))}
     switch (metaAttribute.AttributeType)
     {
         case AttributeType.Singleton:
-            caseBody = $@"// Singleton Attribute
+            caseBody = $@"// Singleton Attribute (no merging)
                     return {c};";
             break;
         case AttributeType.Data:
             caseBody = $@"// Data Attribute
-                    return collections.GetAttributesOfType<{c}>().ToArray().MergeDataAttributes<{c}, {typedDataType}>();";
+                    return collections.{nameof(AttributeCollectionExtensions.GetAttributesOfType)}<{c}>().ToArray().{nameof(AttributeExtensions.MergeDataAttributes)}<{c}, {typedDataType}>();";
             break;
         case AttributeType.Index:
             caseBody = $@"// Index Attribute
-                    return collections.GetIndexedAttributesOfType<{c}>().MergeIndexAttributes();";
+                    return collections.{nameof(AttributeCollectionExtensions.GetIndexedAttributesOfType)}<{c}>().{nameof(AttributeExtensions.MergeIndexAttributes)}();";
             break;
         default:
             throw new ArgumentOutOfRangeException(nameof(metaAttribute.AttributeType));
@@ -220,6 +220,40 @@ $"                [{c}.AttributeName] = {c}.CreateAttributeReader(),"))}
                 default:
                     throw new ArgumentException(nameof(attributeName));
             }}
+        }}
+
+        public void Validate() 
+        {{
+            // Ensure all the indices are either -1 or within the bounds of the attributes they are indexing into.
+{string.Join(Environment.NewLine, attributeClasses.Select(c =>
+    {
+        var metaAttribute = metaAttributes.Single(ma => ma.ClassName == c);
+        var typedDataType = metaAttribute.GetTypedDataType();
+
+        switch (metaAttribute.AttributeType)
+        {
+            case AttributeType.Singleton:
+            case AttributeType.Data:
+                return null;
+            case AttributeType.Index:
+                return $@"
+            {{
+                var maxIndex = GetAttribute({c}.IndexInto).Data.Length - 1;
+                for (var i = 0; i < {c}.TypedData.Length; ++i)
+                {{
+                    var index = {c}.TypedData[i];
+
+                    if (index == -1)
+                        continue; // no relation.
+
+                    if (index < -1 || index > maxIndex)
+                        throw new Exception($""Index out of range in {c} at position {{i}}. Expected either -1 for no relation, or a maximum of {{maxIndex}} but got {{index}}"");
+                }}
+            }}";
+            default:
+                throw new ArgumentOutOfRangeException(nameof(metaAttribute.AttributeType));
+        }
+    }).Where(s => !string.IsNullOrEmpty(s)))}
         }}
     }}");
             }

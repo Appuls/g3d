@@ -84,11 +84,8 @@ namespace Vim.G3d.Tests
             Assert.IsNotNull(g3d);
         }
 
-        [Test]
-        public static void WriteG3dTest()
+        public static G3d<VimAttributeCollection> CreateTestG3d()
         {
-            var testDir = PrepareTestDir();
-
             var g3d = new G3d<VimAttributeCollection>();
             var attrs = g3d.AttributeCollection;
 
@@ -96,7 +93,7 @@ namespace Vim.G3d.Tests
             attrs.VertexAttribute.TypedData = new Vector3[] { Vector3.Zero, Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ };
             attrs.IndexAttribute.TypedData = new int[] { 0, 1, 2, 0, 3, 2, 1, 3, 2 };
             attrs.SubmeshIndexOffsetAttribute.TypedData = new int[] { 0, 3, 6 };
-            attrs.SubmeshMaterialAttribute.TypedData = new int[] { 0, 1, 2 };
+            attrs.SubmeshMaterialAttribute.TypedData = new int[] { 0 };
             attrs.MeshSubmeshOffsetAttribute.TypedData = new int[] { 0 };
             attrs.InstanceTransformAttribute.TypedData = new Matrix4x4[] { Matrix4x4.Identity };
             attrs.InstanceMeshAttribute.TypedData = new int[] { 0 };
@@ -105,16 +102,23 @@ namespace Vim.G3d.Tests
             attrs.MaterialGlossinessAttribute.TypedData = new float[] { .95f };
             attrs.MaterialSmoothnessAttribute.TypedData = new float[] { .5f };
 
-            var outputFile = new FileInfo(Path.Combine(testDir!, "test.g3d"));
-            using (var fileStream = outputFile.OpenWrite())
-                g3d.Write(fileStream);
+            g3d.Validate();
 
-            G3d<VimAttributeCollection>? readG3d = null;
-            using (var fileStream = outputFile.OpenRead())
-            {
-                var readResult = G3d<VimAttributeCollection>.TryRead(fileStream, out readG3d);
-                Assert.IsTrue(readResult);
-            }
+            return g3d;
+        }
+
+        [Test]
+        public static void WriteG3dTest()
+        {
+            var testDir = PrepareTestDir();
+
+            var g3d = CreateTestG3d();
+
+            var g3dFilePath = Path.Combine(testDir!, "test.g3d");
+            g3d.Write(g3dFilePath);
+
+            var readResult = G3d<VimAttributeCollection>.TryRead(g3dFilePath, out var readG3d);
+            Assert.IsTrue(readResult);
 
             // Compare the buffers.
             foreach (var attributeName in readG3d.AttributeCollection.AttributeNames)
@@ -130,10 +134,82 @@ namespace Vim.G3d.Tests
         {
             var testDir = PrepareTestDir();
 
-            var g3d = new G3d<VimAttributeCollection>();
-            var attrs = g3d.AttributeCollection;
+            var g3d = CreateTestG3d();
 
-            // TODO: test attribute merging.
+            var mergedG3d = new[] { g3d, g3d }.Merge();
+
+            var g3dFilePath = Path.Combine(testDir!, "merged.g3d");
+            mergedG3d.Write(g3dFilePath);
+
+            var readResult = G3d<VimAttributeCollection>.TryRead(g3dFilePath, out var readG3d);
+            Assert.IsTrue(readResult);
+
+            var mac = readG3d.AttributeCollection;
+
+            {
+                var merged = g3d.AttributeCollection.CornersPerFaceAttribute.TypedData;
+                Assert.AreEqual(merged, mac.CornersPerFaceAttribute.TypedData);
+            }
+
+            {
+                var merged = Enumerable.Repeat(g3d.AttributeCollection.VertexAttribute.TypedData, 2).SelectMany(v => v).ToArray();
+                Assert.AreEqual(merged, mac.VertexAttribute.TypedData);
+            }
+
+            {
+                var tmp = g3d.AttributeCollection.IndexAttribute.TypedData;
+                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.NumVertices).ToArray() }.SelectMany(v => v).ToArray();
+                Assert.AreEqual(merged, mac.IndexAttribute.TypedData);
+            }
+
+            {
+                var tmp = g3d.AttributeCollection.SubmeshIndexOffsetAttribute.TypedData;
+                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.NumIndices).ToArray() }.SelectMany(v => v).ToArray();
+                Assert.AreEqual(merged, mac.SubmeshIndexOffsetAttribute.TypedData);
+            }
+
+            {
+                var tmp = g3d.AttributeCollection.SubmeshMaterialAttribute.TypedData;
+                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.NumMaterials).ToArray() }.SelectMany(v => v).ToArray();
+                Assert.AreEqual(merged, mac.SubmeshMaterialAttribute.TypedData);
+            }
+
+            {
+                var tmp = g3d.AttributeCollection.MeshSubmeshOffsetAttribute.TypedData;
+                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.NumSubmeshes).ToArray() }.SelectMany(v => v).ToArray();
+                Assert.AreEqual(merged, mac.MeshSubmeshOffsetAttribute.TypedData);
+            }
+
+            {
+                var merged = Enumerable.Repeat(g3d.AttributeCollection.InstanceTransformAttribute.TypedData, 2).SelectMany(v => v).ToArray();
+                Assert.AreEqual(merged, mac.InstanceTransformAttribute.TypedData);
+            }
+
+            {
+                var tmp = g3d.AttributeCollection.InstanceMeshAttribute.TypedData;
+                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.NumMeshes).ToArray() }.SelectMany(v => v).ToArray();
+                Assert.AreEqual(merged, mac.InstanceMeshAttribute.TypedData);
+            }
+
+            {
+                var merged = Enumerable.Repeat(g3d.AttributeCollection.InstanceParentAttribute.TypedData, 2).SelectMany(v => v).ToArray();
+                Assert.AreEqual(merged, mac.InstanceParentAttribute.TypedData);
+            }
+
+            {
+                var merged = Enumerable.Repeat(g3d.AttributeCollection.MaterialColorAttribute.TypedData, 2).SelectMany(v => v).ToArray();
+                Assert.AreEqual(merged, mac.MaterialColorAttribute.TypedData);
+            }
+
+            {
+                var merged = Enumerable.Repeat(g3d.AttributeCollection.MaterialGlossinessAttribute.TypedData, 2).SelectMany(v => v).ToArray();
+                Assert.AreEqual(merged, mac.MaterialGlossinessAttribute.TypedData);
+            }
+
+            {
+                var merged = Enumerable.Repeat(g3d.AttributeCollection.MaterialSmoothnessAttribute.TypedData, 2).SelectMany(v => v).ToArray();
+                Assert.AreEqual(merged, mac.MaterialSmoothnessAttribute.TypedData);
+            }
         }
     }
 }

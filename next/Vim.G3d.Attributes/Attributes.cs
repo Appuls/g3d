@@ -127,13 +127,5 @@ namespace Vim.G3d.Attributes
         /// </summary>
         public int NumShapes
             => ShapeVertexOffsetAttribute?.TypedData?.Length ?? 0;
-
-        // -- Computed Indices and Counts --
-
-        public void Validate()
-        {
-            // TODO: validate the multiplicity of all attributes.
-            throw new NotImplementedException();
-        }
     }
 }

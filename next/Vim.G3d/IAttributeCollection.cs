@@ -146,7 +146,6 @@ namespace Vim.G3d
             foreach (var item in @base.Attributes)
             {
                 var name = item.Key;
-                var attr = item.Value;
 
                 var merged = @base.MergeAttribute(name, others);
 
