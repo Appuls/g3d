@@ -12,9 +12,9 @@ namespace Vim.G3d
     public class G3d<TAttributeCollection> where TAttributeCollection : IAttributeCollection, new()
     {
         /// <summary>
-        /// The header of the G3d. Corresponds to the "meta" segment.
+        /// The meta header of the G3d. Corresponds to the "meta" segment.
         /// </summary>
-        public readonly Header Header;
+        public readonly MetaHeader MetaHeader;
 
         /// <summary>
         /// The attributes of the G3d.
@@ -24,9 +24,9 @@ namespace Vim.G3d
         /// <summary>
         /// Constructor.
         /// </summary>
-        public G3d(Header header, TAttributeCollection attributeCollection)
+        public G3d(MetaHeader metaHeader, TAttributeCollection attributeCollection)
         {
-            Header = header;
+            MetaHeader = metaHeader;
             AttributeCollection = attributeCollection;
         }
 
@@ -34,14 +34,14 @@ namespace Vim.G3d
         /// Constructor. Uses the default header.
         /// </summary>
         public G3d(TAttributeCollection attributeCollection) 
-            : this(Header.Default, attributeCollection)
+            : this(MetaHeader.Default, attributeCollection)
         { }
 
         /// <summary>
         /// Constructor. Uses the default header and instantiates an attribute collection.
         /// </summary>
         public G3d()
-            : this(Header.Default, new TAttributeCollection())
+            : this(MetaHeader.Default, new TAttributeCollection())
         { }
 
         /// <summary>
@@ -50,15 +50,15 @@ namespace Vim.G3d
         public static bool TryRead(Stream stream, out G3d<TAttributeCollection> g3d)
         {
             g3d = null;
-            Header? header = null;
+            MetaHeader? metaHeader = null;
             var attributeCollection = new TAttributeCollection();
 
             object OnG3dSegment(Stream s, string name, long size)
             {
-                if (Header.IsSegmentHeader(name, size) && Header.TryRead(s, size, out var outHeader))
+                if (MetaHeader.IsSegmentMetaHeader(name, size) && MetaHeader.TryRead(s, size, out var outMetaHeader))
                 {
                     // Assign to the header variable in the closure.
-                    return header = outHeader;
+                    return metaHeader = outMetaHeader;
                 }
 
                 // The segment is not the header so treat it as an attribute.
@@ -68,7 +68,7 @@ namespace Vim.G3d
             _ = stream.ReadBFast(OnG3dSegment);
 
             // Failure case if the header was not found.
-            if (!header.HasValue)
+            if (!metaHeader.HasValue)
                 return false;
 
             try
@@ -83,7 +83,7 @@ namespace Vim.G3d
             }
 
             // Instantiate the object and return.
-            g3d = new G3d<TAttributeCollection>(header.Value, attributeCollection);
+            g3d = new G3d<TAttributeCollection>(metaHeader.Value, attributeCollection);
             return true;
         }
 
@@ -101,16 +101,15 @@ namespace Vim.G3d
         /// <summary>
         /// Returns the G3d BFast header information, including buffer names and buffer sizes in bytes.
         /// </summary>
-        private static (BFastHeader BFastHeader, string[] BufferNames, long[] BufferSizesInBytes ) GetBFastHeaderInfo(
-            Header header,
+        private static (BFastHeader BFastHeader, string[] BufferNames, long[] BufferSizesInBytes) GetBFastHeaderInfo(
+            NamedBuffer<byte> metaHeaderBuffer,
             IReadOnlyList<IAttribute> attributes)
         {
             var nameList = new List<string>();
             var sizesInBytesList = new List<long>();
 
-            var metaBuffer = header.ToBytes().ToNamedBuffer(Header.SegmentName);
-            nameList.Add(metaBuffer.Name);
-            sizesInBytesList.Add(metaBuffer.NumBytes());
+            nameList.Add(metaHeaderBuffer.Name);
+            sizesInBytesList.Add(metaHeaderBuffer.NumBytes());
 
             foreach (var attribute in attributes)
             {
@@ -135,15 +134,15 @@ namespace Vim.G3d
         /// </summary>
         public void Write(Stream stream)
         {
-            var metaBuffer = Header.ToBytes().ToNamedBuffer(Header.SegmentName);
+            var metaHeaderBuffer = MetaHeader.ToNamedBuffer();
             var attributes = AttributeCollection.Attributes.Values.OrderBy(n => n.Name).ToArray(); // Order the attributes by name for consistency
 
             // Prepare the bfast header, which describes the names and ranges.
-            var (bfastHeader, bufferNames, bufferSizesInBytes) = GetBFastHeaderInfo(Header, attributes);
+            var (bfastHeader, bufferNames, bufferSizesInBytes) = GetBFastHeaderInfo(metaHeaderBuffer, attributes);
 
             // Prepare the stream writers.
             var streamWriters = new StreamWriter[1 + attributes.Length];
-            streamWriters[0] = s => s.Write(metaBuffer); // First stream writer is the "meta" buffer.
+            streamWriters[0] = s => s.Write(metaHeaderBuffer); // First stream writer is the "meta" buffer.
             for (int i = 0; i < attributes.Length; i++)
             {
                 var attr = attributes[i];
