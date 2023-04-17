@@ -20,6 +20,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vim.G3d.CodeGen", "Vim.G3d.CodeGen\Vim.G3d.CodeGen.csproj", "{225346DC-7CEB-4B13-A5A9-76AFA58D4932}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vim.G3d.Attributes", "Vim.G3d.Attributes\Vim.G3d.Attributes.csproj", "{184CB721-B8E7-44C2-A103-73CEF22696C1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{48EC226C-4F2E-4AE7-A4D7-71278A213336} = {48EC226C-4F2E-4AE7-A4D7-71278A213336}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vim.G3d.CodeGen2", "Vim.G3d.CodeGen2\Vim.G3d.CodeGen2.csproj", "{48EC226C-4F2E-4AE7-A4D7-71278A213336}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +52,10 @@ Global
 		{184CB721-B8E7-44C2-A103-73CEF22696C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{184CB721-B8E7-44C2-A103-73CEF22696C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{184CB721-B8E7-44C2-A103-73CEF22696C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48EC226C-4F2E-4AE7-A4D7-71278A213336}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48EC226C-4F2E-4AE7-A4D7-71278A213336}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48EC226C-4F2E-4AE7-A4D7-71278A213336}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48EC226C-4F2E-4AE7-A4D7-71278A213336}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

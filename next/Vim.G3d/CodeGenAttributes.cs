@@ -21,9 +21,9 @@ namespace Vim.G3d
     [AttributeUsage(AttributeTargets.Class)]
     public class AttributeCollectionAttribute : Attribute
     {
-        private readonly Type[] _bufferClasses;
+        public Type[] AttributeClasses { get; }
 
-        public AttributeCollectionAttribute(params Type[] bufferClasses)
-            => _bufferClasses = bufferClasses;
+        public AttributeCollectionAttribute(params Type[] attributeClasses)
+            => AttributeClasses = attributeClasses;
     }
 }

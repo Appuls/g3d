@@ -12,7 +12,7 @@ namespace Vim.G3d.Attributes
         public VimG3dShapeFactory(VimAttributeCollection vac)
         {
             _vac = vac;
-            _shapeVertexCounts = _vac.ShapeVertexOffsetAttribute?.TypedData.GetSubArrayCounts(_vac.NumSubmeshes);
+            _shapeVertexCounts = _vac.ShapeVertexOffsetAttribute?.TypedData.GetSubArrayCounts(_vac.GetNumSubmeshes());
         }
 
         public IEnumerable<int> GetShapeVertexIndices(int shapeIndex)

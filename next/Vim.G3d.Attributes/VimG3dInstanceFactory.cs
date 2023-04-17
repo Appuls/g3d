@@ -12,7 +12,7 @@ namespace Vim.G3d.Attributes
         public VimG3dInstanceFactory(VimAttributeCollection vac)
         {
             _vac = vac;
-            _meshSubmeshCount = _vac.MeshSubmeshOffsetAttribute?.TypedData.GetSubArrayCounts(_vac.NumSubmeshes);
+            _meshSubmeshCount = _vac.MeshSubmeshOffsetAttribute?.TypedData.GetSubArrayCounts(_vac.GetNumSubmeshes());
         }
 
         public IEnumerable<int> GetMeshSubmeshIndices(int meshIndex)
