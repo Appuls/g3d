@@ -7,55 +7,55 @@ namespace Vim.G3d.Attributes
         /// <summary>
         /// The number of corners per face. A value of 3 designates that all faces are triangles (a triangle has 3 corners).
         /// </summary>
-        public static int GetNumCornersPerFace(this VimAttributeCollection c)
+        public static int GetCornersPerFaceCount(this VimAttributeCollection c)
             => c.CornersPerFaceAttribute?.TypedData?.First() ?? 0;
 
         /// <summary>
         /// The total number of indices.
         /// </summary>
-        public static int GetNumIndices(this VimAttributeCollection c)
+        public static int GetIndexCount(this VimAttributeCollection c)
             => c.IndexAttribute?.TypedData?.Length ?? 0;
 
         /// <summary>
         /// The total number of vertices.
         /// </summary>
-        public static int GetNumVertices(this VimAttributeCollection c)
+        public static int GetVertexCount(this VimAttributeCollection c)
             => c.VertexAttribute?.TypedData?.Length ?? 0;
 
         /// <summary>
         /// The total number of instances.
         /// </summary>
-        public static int GetNumInstances(this VimAttributeCollection c)
+        public static int GetInstanceCount(this VimAttributeCollection c)
             => c.InstanceTransformAttribute?.TypedData?.Length ?? 0;
 
         /// <summary>
         /// The total number of meshes.
         /// </summary>
-        public static int GetNumMeshes(this VimAttributeCollection c)
+        public static int GetMeshCount(this VimAttributeCollection c)
             => c.MeshSubmeshOffsetAttribute?.TypedData?.Length ?? 0;
 
         /// <summary>
         /// The total number of submeshes.
         /// </summary>
-        public static int GetNumSubmeshes(this VimAttributeCollection c)
+        public static int GetSubmeshCount(this VimAttributeCollection c)
             => c.SubmeshIndexOffsetAttribute?.TypedData?.Length ?? 0;
 
         /// <summary>
         /// The total number of materials.
         /// </summary>
-        public static int GetNumMaterials(this VimAttributeCollection c)
+        public static int GetMaterialCount(this VimAttributeCollection c)
             => c.MaterialColorAttribute?.TypedData?.Length ?? 0;
 
         /// <summary>
         /// The total number of shape vertices.
         /// </summary>
-        public static int GetNumShapeVertices(this VimAttributeCollection c)
+        public static int GetShapeVertexCount(this VimAttributeCollection c)
             => c.ShapeVertexAttribute?.TypedData?.Length ?? 0;
 
         /// <summary>
         /// The total number of shapes.
         /// </summary>
-        public static int GetNumShapes(this VimAttributeCollection c)
+        public static int GetShapeCount(this VimAttributeCollection c)
             => c.ShapeVertexOffsetAttribute?.TypedData?.Length ?? 0;
     }
 }

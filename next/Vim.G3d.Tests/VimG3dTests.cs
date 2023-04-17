@@ -158,25 +158,25 @@ namespace Vim.G3d.Tests
 
             {
                 var tmp = g3d.AttributeCollection.IndexAttribute.TypedData;
-                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.NumVertices).ToArray() }.SelectMany(v => v).ToArray();
+                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.GetVertexCount()).ToArray() }.SelectMany(v => v).ToArray();
                 Assert.AreEqual(merged, mac.IndexAttribute.TypedData);
             }
 
             {
                 var tmp = g3d.AttributeCollection.SubmeshIndexOffsetAttribute.TypedData;
-                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.NumIndices).ToArray() }.SelectMany(v => v).ToArray();
+                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.GetIndexCount()).ToArray() }.SelectMany(v => v).ToArray();
                 Assert.AreEqual(merged, mac.SubmeshIndexOffsetAttribute.TypedData);
             }
 
             {
                 var tmp = g3d.AttributeCollection.SubmeshMaterialAttribute.TypedData;
-                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.NumMaterials).ToArray() }.SelectMany(v => v).ToArray();
+                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.GetMaterialCount()).ToArray() }.SelectMany(v => v).ToArray();
                 Assert.AreEqual(merged, mac.SubmeshMaterialAttribute.TypedData);
             }
 
             {
                 var tmp = g3d.AttributeCollection.MeshSubmeshOffsetAttribute.TypedData;
-                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.NumSubmeshes).ToArray() }.SelectMany(v => v).ToArray();
+                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.GetSubmeshCount()).ToArray() }.SelectMany(v => v).ToArray();
                 Assert.AreEqual(merged, mac.MeshSubmeshOffsetAttribute.TypedData);
             }
 
@@ -187,7 +187,7 @@ namespace Vim.G3d.Tests
 
             {
                 var tmp = g3d.AttributeCollection.InstanceMeshAttribute.TypedData;
-                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.NumMeshes).ToArray() }.SelectMany(v => v).ToArray();
+                var merged = new[] { tmp, tmp.Select(i => i + g3d.AttributeCollection.GetMeshCount()).ToArray() }.SelectMany(v => v).ToArray();
                 Assert.AreEqual(merged, mac.InstanceMeshAttribute.TypedData);
             }
 
