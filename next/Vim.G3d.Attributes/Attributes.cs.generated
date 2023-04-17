@@ -1,0 +1,937 @@
+// Generated code based on attribute definitions in Attributes.cs
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Vim.BFast;
+using Vim.G3d;
+using Vim.Math3d;
+
+namespace Vim.G3d.Attributes
+{
+
+    public partial class CornersPerFaceAttribute : IAttribute<System.Int32>
+    {
+        public const string AttributeName = "g3d:all:facesize:0:int32:1";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<CornersPerFaceAttribute, System.Int32>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Singleton;
+
+        public Type IndexInto { get; }
+            = null;
+
+        public System.Int32[] TypedData { get; set; }
+            = Array.Empty<System.Int32>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class VertexAttribute : IAttribute<Vector3>
+    {
+        public const string AttributeName = "g3d:vertex:position:0:float32:3";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<VertexAttribute, Vector3>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Data;
+
+        public Type IndexInto { get; }
+            = null;
+
+        public Vector3[] TypedData { get; set; }
+            = Array.Empty<Vector3>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class IndexAttribute : IAttribute<System.Int32>
+    {
+        public const string AttributeName = "g3d:corner:index:0:int32:1";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<IndexAttribute, System.Int32>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Index;
+
+        public Type IndexInto { get; }
+            = typeof(VertexAttribute);
+
+        public System.Int32[] TypedData { get; set; }
+            = Array.Empty<System.Int32>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class InstanceTransformAttribute : IAttribute<Matrix4x4>
+    {
+        public const string AttributeName = "g3d:instance:transform:0:float32:16";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<InstanceTransformAttribute, Matrix4x4>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Data;
+
+        public Type IndexInto { get; }
+            = null;
+
+        public Matrix4x4[] TypedData { get; set; }
+            = Array.Empty<Matrix4x4>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class InstanceParentAttribute : IAttribute<System.Int32>
+    {
+        public const string AttributeName = "g3d:instance:parent:0:int32:1";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<InstanceParentAttribute, System.Int32>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Index;
+
+        public Type IndexInto { get; }
+            = typeof(InstanceTransformAttribute);
+
+        public System.Int32[] TypedData { get; set; }
+            = Array.Empty<System.Int32>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class InstanceMeshAttribute : IAttribute<System.Int32>
+    {
+        public const string AttributeName = "g3d:instance:mesh:0:int32:1";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<InstanceMeshAttribute, System.Int32>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Index;
+
+        public Type IndexInto { get; }
+            = typeof(MeshSubmeshOffsetAttribute);
+
+        public System.Int32[] TypedData { get; set; }
+            = Array.Empty<System.Int32>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class MeshSubmeshOffsetAttribute : IAttribute<System.Int32>
+    {
+        public const string AttributeName = "g3d:mesh:submeshoffset:0:int32:1";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<MeshSubmeshOffsetAttribute, System.Int32>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Index;
+
+        public Type IndexInto { get; }
+            = typeof(SubmeshIndexOffsetAttribute);
+
+        public System.Int32[] TypedData { get; set; }
+            = Array.Empty<System.Int32>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class SubmeshIndexOffsetAttribute : IAttribute<System.Int32>
+    {
+        public const string AttributeName = "g3d:submesh:indexoffset:0:int32:1";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<SubmeshIndexOffsetAttribute, System.Int32>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Index;
+
+        public Type IndexInto { get; }
+            = typeof(IndexAttribute);
+
+        public System.Int32[] TypedData { get; set; }
+            = Array.Empty<System.Int32>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class SubmeshMaterialAttribute : IAttribute<System.Int32>
+    {
+        public const string AttributeName = "g3d:submesh:material:0:int32:1";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<SubmeshMaterialAttribute, System.Int32>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Index;
+
+        public Type IndexInto { get; }
+            = typeof(MaterialColorAttribute);
+
+        public System.Int32[] TypedData { get; set; }
+            = Array.Empty<System.Int32>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class MaterialColorAttribute : IAttribute<Vector4>
+    {
+        public const string AttributeName = "g3d:material:color:0:float32:4";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<MaterialColorAttribute, Vector4>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Data;
+
+        public Type IndexInto { get; }
+            = null;
+
+        public Vector4[] TypedData { get; set; }
+            = Array.Empty<Vector4>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class MaterialGlossinessAttribute : IAttribute<System.Single>
+    {
+        public const string AttributeName = "g3d:material:glossiness:0:float32:1";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<MaterialGlossinessAttribute, System.Single>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Data;
+
+        public Type IndexInto { get; }
+            = null;
+
+        public System.Single[] TypedData { get; set; }
+            = Array.Empty<System.Single>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class MaterialSmoothnessAttribute : IAttribute<System.Single>
+    {
+        public const string AttributeName = "g3d:material:smoothness:0:float32:1";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<MaterialSmoothnessAttribute, System.Single>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Data;
+
+        public Type IndexInto { get; }
+            = null;
+
+        public System.Single[] TypedData { get; set; }
+            = Array.Empty<System.Single>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class ShapeVertexAttribute : IAttribute<Vector3>
+    {
+        public const string AttributeName = "g3d:shapevertex:position:0:float32:3";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<ShapeVertexAttribute, Vector3>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Data;
+
+        public Type IndexInto { get; }
+            = null;
+
+        public Vector3[] TypedData { get; set; }
+            = Array.Empty<Vector3>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class ShapeVertexOffsetAttribute : IAttribute<System.Int32>
+    {
+        public const string AttributeName = "g3d:shape:vertexoffset:0:int32:1";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<ShapeVertexOffsetAttribute, System.Int32>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Index;
+
+        public Type IndexInto { get; }
+            = typeof(ShapeVertexAttribute);
+
+        public System.Int32[] TypedData { get; set; }
+            = Array.Empty<System.Int32>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class ShapeColorAttribute : IAttribute<Vector4>
+    {
+        public const string AttributeName = "g3d:shape:color:0:float32:4";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<ShapeColorAttribute, Vector4>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Data;
+
+        public Type IndexInto { get; }
+            = null;
+
+        public Vector4[] TypedData { get; set; }
+            = Array.Empty<Vector4>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class ShapeWidthAttribute : IAttribute<System.Single>
+    {
+        public const string AttributeName = "g3d:shape:width:0:float32:1";
+
+        public string Name
+            => AttributeName;
+
+        public static AttributeReader CreateAttributeReader()
+            => AttributeCollectionExtensions.CreateAttributeReader<ShapeWidthAttribute, System.Single>();
+
+        public IAttributeDescriptor AttributeDescriptor { get; }
+            = new AttributeDescriptor(AttributeName);
+
+        public AttributeType AttributeType { get; }
+            = AttributeType.Data;
+
+        public Type IndexInto { get; }
+            = null;
+
+        public System.Single[] TypedData { get; set; }
+            = Array.Empty<System.Single>();
+
+        public Array Data => TypedData;
+
+        public void Write(Stream stream)
+        {
+            if (TypedData == null || TypedData.Length == 0)
+                return;
+            stream.Write(TypedData);
+        }
+    }
+
+    public partial class VimAttributeCollection : IAttributeCollection
+    {
+        public IEnumerable<string> AttributeNames
+            => Attributes.Keys;
+
+        public IDictionary<string, IAttribute> Attributes { get; }
+            = new Dictionary<string, IAttribute>
+            {
+                [CornersPerFaceAttribute.AttributeName] = new CornersPerFaceAttribute(),
+                [VertexAttribute.AttributeName] = new VertexAttribute(),
+                [IndexAttribute.AttributeName] = new IndexAttribute(),
+                [InstanceTransformAttribute.AttributeName] = new InstanceTransformAttribute(),
+                [InstanceParentAttribute.AttributeName] = new InstanceParentAttribute(),
+                [InstanceMeshAttribute.AttributeName] = new InstanceMeshAttribute(),
+                [MeshSubmeshOffsetAttribute.AttributeName] = new MeshSubmeshOffsetAttribute(),
+                [SubmeshIndexOffsetAttribute.AttributeName] = new SubmeshIndexOffsetAttribute(),
+                [SubmeshMaterialAttribute.AttributeName] = new SubmeshMaterialAttribute(),
+                [MaterialColorAttribute.AttributeName] = new MaterialColorAttribute(),
+                [MaterialGlossinessAttribute.AttributeName] = new MaterialGlossinessAttribute(),
+                [MaterialSmoothnessAttribute.AttributeName] = new MaterialSmoothnessAttribute(),
+                [ShapeVertexAttribute.AttributeName] = new ShapeVertexAttribute(),
+                [ShapeVertexOffsetAttribute.AttributeName] = new ShapeVertexOffsetAttribute(),
+                [ShapeColorAttribute.AttributeName] = new ShapeColorAttribute(),
+                [ShapeWidthAttribute.AttributeName] = new ShapeWidthAttribute(),
+            };
+
+        public IDictionary<string, AttributeReader> AttributeReaders { get; }
+            = new Dictionary<string, AttributeReader>
+            {
+                [CornersPerFaceAttribute.AttributeName] = CornersPerFaceAttribute.CreateAttributeReader(),
+                [VertexAttribute.AttributeName] = VertexAttribute.CreateAttributeReader(),
+                [IndexAttribute.AttributeName] = IndexAttribute.CreateAttributeReader(),
+                [InstanceTransformAttribute.AttributeName] = InstanceTransformAttribute.CreateAttributeReader(),
+                [InstanceParentAttribute.AttributeName] = InstanceParentAttribute.CreateAttributeReader(),
+                [InstanceMeshAttribute.AttributeName] = InstanceMeshAttribute.CreateAttributeReader(),
+                [MeshSubmeshOffsetAttribute.AttributeName] = MeshSubmeshOffsetAttribute.CreateAttributeReader(),
+                [SubmeshIndexOffsetAttribute.AttributeName] = SubmeshIndexOffsetAttribute.CreateAttributeReader(),
+                [SubmeshMaterialAttribute.AttributeName] = SubmeshMaterialAttribute.CreateAttributeReader(),
+                [MaterialColorAttribute.AttributeName] = MaterialColorAttribute.CreateAttributeReader(),
+                [MaterialGlossinessAttribute.AttributeName] = MaterialGlossinessAttribute.CreateAttributeReader(),
+                [MaterialSmoothnessAttribute.AttributeName] = MaterialSmoothnessAttribute.CreateAttributeReader(),
+                [ShapeVertexAttribute.AttributeName] = ShapeVertexAttribute.CreateAttributeReader(),
+                [ShapeVertexOffsetAttribute.AttributeName] = ShapeVertexOffsetAttribute.CreateAttributeReader(),
+                [ShapeColorAttribute.AttributeName] = ShapeColorAttribute.CreateAttributeReader(),
+                [ShapeWidthAttribute.AttributeName] = ShapeWidthAttribute.CreateAttributeReader(),
+            };
+
+        // Named Attributes.
+
+        public CornersPerFaceAttribute CornersPerFaceAttribute
+        {
+            get => Attributes.TryGetValue(CornersPerFaceAttribute.AttributeName, out var attr) ? attr as CornersPerFaceAttribute : default;
+            set => Attributes[CornersPerFaceAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public VertexAttribute VertexAttribute
+        {
+            get => Attributes.TryGetValue(VertexAttribute.AttributeName, out var attr) ? attr as VertexAttribute : default;
+            set => Attributes[VertexAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public IndexAttribute IndexAttribute
+        {
+            get => Attributes.TryGetValue(IndexAttribute.AttributeName, out var attr) ? attr as IndexAttribute : default;
+            set => Attributes[IndexAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public InstanceTransformAttribute InstanceTransformAttribute
+        {
+            get => Attributes.TryGetValue(InstanceTransformAttribute.AttributeName, out var attr) ? attr as InstanceTransformAttribute : default;
+            set => Attributes[InstanceTransformAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public InstanceParentAttribute InstanceParentAttribute
+        {
+            get => Attributes.TryGetValue(InstanceParentAttribute.AttributeName, out var attr) ? attr as InstanceParentAttribute : default;
+            set => Attributes[InstanceParentAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public InstanceMeshAttribute InstanceMeshAttribute
+        {
+            get => Attributes.TryGetValue(InstanceMeshAttribute.AttributeName, out var attr) ? attr as InstanceMeshAttribute : default;
+            set => Attributes[InstanceMeshAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public MeshSubmeshOffsetAttribute MeshSubmeshOffsetAttribute
+        {
+            get => Attributes.TryGetValue(MeshSubmeshOffsetAttribute.AttributeName, out var attr) ? attr as MeshSubmeshOffsetAttribute : default;
+            set => Attributes[MeshSubmeshOffsetAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public SubmeshIndexOffsetAttribute SubmeshIndexOffsetAttribute
+        {
+            get => Attributes.TryGetValue(SubmeshIndexOffsetAttribute.AttributeName, out var attr) ? attr as SubmeshIndexOffsetAttribute : default;
+            set => Attributes[SubmeshIndexOffsetAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public SubmeshMaterialAttribute SubmeshMaterialAttribute
+        {
+            get => Attributes.TryGetValue(SubmeshMaterialAttribute.AttributeName, out var attr) ? attr as SubmeshMaterialAttribute : default;
+            set => Attributes[SubmeshMaterialAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public MaterialColorAttribute MaterialColorAttribute
+        {
+            get => Attributes.TryGetValue(MaterialColorAttribute.AttributeName, out var attr) ? attr as MaterialColorAttribute : default;
+            set => Attributes[MaterialColorAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public MaterialGlossinessAttribute MaterialGlossinessAttribute
+        {
+            get => Attributes.TryGetValue(MaterialGlossinessAttribute.AttributeName, out var attr) ? attr as MaterialGlossinessAttribute : default;
+            set => Attributes[MaterialGlossinessAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public MaterialSmoothnessAttribute MaterialSmoothnessAttribute
+        {
+            get => Attributes.TryGetValue(MaterialSmoothnessAttribute.AttributeName, out var attr) ? attr as MaterialSmoothnessAttribute : default;
+            set => Attributes[MaterialSmoothnessAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public ShapeVertexAttribute ShapeVertexAttribute
+        {
+            get => Attributes.TryGetValue(ShapeVertexAttribute.AttributeName, out var attr) ? attr as ShapeVertexAttribute : default;
+            set => Attributes[ShapeVertexAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public ShapeVertexOffsetAttribute ShapeVertexOffsetAttribute
+        {
+            get => Attributes.TryGetValue(ShapeVertexOffsetAttribute.AttributeName, out var attr) ? attr as ShapeVertexOffsetAttribute : default;
+            set => Attributes[ShapeVertexOffsetAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public ShapeColorAttribute ShapeColorAttribute
+        {
+            get => Attributes.TryGetValue(ShapeColorAttribute.AttributeName, out var attr) ? attr as ShapeColorAttribute : default;
+            set => Attributes[ShapeColorAttribute.AttributeName] = value as IAttribute;
+        }
+
+        public ShapeWidthAttribute ShapeWidthAttribute
+        {
+            get => Attributes.TryGetValue(ShapeWidthAttribute.AttributeName, out var attr) ? attr as ShapeWidthAttribute : default;
+            set => Attributes[ShapeWidthAttribute.AttributeName] = value as IAttribute;
+        }
+
+        /// <inheritdoc/>
+        public IAttribute GetAttribute(Type attributeType)
+        {
+
+            if (attributeType == typeof(CornersPerFaceAttribute))
+                return CornersPerFaceAttribute;
+
+            if (attributeType == typeof(VertexAttribute))
+                return VertexAttribute;
+
+            if (attributeType == typeof(IndexAttribute))
+                return IndexAttribute;
+
+            if (attributeType == typeof(InstanceTransformAttribute))
+                return InstanceTransformAttribute;
+
+            if (attributeType == typeof(InstanceParentAttribute))
+                return InstanceParentAttribute;
+
+            if (attributeType == typeof(InstanceMeshAttribute))
+                return InstanceMeshAttribute;
+
+            if (attributeType == typeof(MeshSubmeshOffsetAttribute))
+                return MeshSubmeshOffsetAttribute;
+
+            if (attributeType == typeof(SubmeshIndexOffsetAttribute))
+                return SubmeshIndexOffsetAttribute;
+
+            if (attributeType == typeof(SubmeshMaterialAttribute))
+                return SubmeshMaterialAttribute;
+
+            if (attributeType == typeof(MaterialColorAttribute))
+                return MaterialColorAttribute;
+
+            if (attributeType == typeof(MaterialGlossinessAttribute))
+                return MaterialGlossinessAttribute;
+
+            if (attributeType == typeof(MaterialSmoothnessAttribute))
+                return MaterialSmoothnessAttribute;
+
+            if (attributeType == typeof(ShapeVertexAttribute))
+                return ShapeVertexAttribute;
+
+            if (attributeType == typeof(ShapeVertexOffsetAttribute))
+                return ShapeVertexOffsetAttribute;
+
+            if (attributeType == typeof(ShapeColorAttribute))
+                return ShapeColorAttribute;
+
+            if (attributeType == typeof(ShapeWidthAttribute))
+                return ShapeWidthAttribute;
+
+            throw new ArgumentException("Type {attributeType.ToString()} is not supported.");
+        }
+
+        public IAttribute MergeAttribute(string attributeName, IReadOnlyList<IAttributeCollection> otherCollections)
+        {
+            var collections = otherCollections.Prepend(this).ToArray();
+            switch (attributeName)
+            {
+
+                case CornersPerFaceAttribute.AttributeName:
+                {
+                    // Singleton Attribute (no merging)
+                    return CornersPerFaceAttribute;
+                }
+
+                case VertexAttribute.AttributeName:
+                {
+                    // Data Attribute
+                    return collections.GetAttributesOfType<VertexAttribute>().ToArray().MergeDataAttributes<VertexAttribute, Vector3>();
+                }
+
+                case IndexAttribute.AttributeName:
+                {
+                    // Index Attribute
+                    return collections.GetIndexedAttributesOfType<IndexAttribute>().MergeIndexAttributes();
+                }
+
+                case InstanceTransformAttribute.AttributeName:
+                {
+                    // Data Attribute
+                    return collections.GetAttributesOfType<InstanceTransformAttribute>().ToArray().MergeDataAttributes<InstanceTransformAttribute, Matrix4x4>();
+                }
+
+                case InstanceParentAttribute.AttributeName:
+                {
+                    // Index Attribute
+                    return collections.GetIndexedAttributesOfType<InstanceParentAttribute>().MergeIndexAttributes();
+                }
+
+                case InstanceMeshAttribute.AttributeName:
+                {
+                    // Index Attribute
+                    return collections.GetIndexedAttributesOfType<InstanceMeshAttribute>().MergeIndexAttributes();
+                }
+
+                case MeshSubmeshOffsetAttribute.AttributeName:
+                {
+                    // Index Attribute
+                    return collections.GetIndexedAttributesOfType<MeshSubmeshOffsetAttribute>().MergeIndexAttributes();
+                }
+
+                case SubmeshIndexOffsetAttribute.AttributeName:
+                {
+                    // Index Attribute
+                    return collections.GetIndexedAttributesOfType<SubmeshIndexOffsetAttribute>().MergeIndexAttributes();
+                }
+
+                case SubmeshMaterialAttribute.AttributeName:
+                {
+                    // Index Attribute
+                    return collections.GetIndexedAttributesOfType<SubmeshMaterialAttribute>().MergeIndexAttributes();
+                }
+
+                case MaterialColorAttribute.AttributeName:
+                {
+                    // Data Attribute
+                    return collections.GetAttributesOfType<MaterialColorAttribute>().ToArray().MergeDataAttributes<MaterialColorAttribute, Vector4>();
+                }
+
+                case MaterialGlossinessAttribute.AttributeName:
+                {
+                    // Data Attribute
+                    return collections.GetAttributesOfType<MaterialGlossinessAttribute>().ToArray().MergeDataAttributes<MaterialGlossinessAttribute, System.Single>();
+                }
+
+                case MaterialSmoothnessAttribute.AttributeName:
+                {
+                    // Data Attribute
+                    return collections.GetAttributesOfType<MaterialSmoothnessAttribute>().ToArray().MergeDataAttributes<MaterialSmoothnessAttribute, System.Single>();
+                }
+
+                case ShapeVertexAttribute.AttributeName:
+                {
+                    // Data Attribute
+                    return collections.GetAttributesOfType<ShapeVertexAttribute>().ToArray().MergeDataAttributes<ShapeVertexAttribute, Vector3>();
+                }
+
+                case ShapeVertexOffsetAttribute.AttributeName:
+                {
+                    // Index Attribute
+                    return collections.GetIndexedAttributesOfType<ShapeVertexOffsetAttribute>().MergeIndexAttributes();
+                }
+
+                case ShapeColorAttribute.AttributeName:
+                {
+                    // Data Attribute
+                    return collections.GetAttributesOfType<ShapeColorAttribute>().ToArray().MergeDataAttributes<ShapeColorAttribute, Vector4>();
+                }
+
+                case ShapeWidthAttribute.AttributeName:
+                {
+                    // Data Attribute
+                    return collections.GetAttributesOfType<ShapeWidthAttribute>().ToArray().MergeDataAttributes<ShapeWidthAttribute, System.Single>();
+                }
+
+                default:
+                    throw new ArgumentException(nameof(attributeName));
+            }
+        }
+
+        public void Validate() 
+        {
+            // Ensure all the indices are either -1 or within the bounds of the attributes they are indexing into.
+
+            {
+                var maxIndex = GetAttribute(IndexAttribute.IndexInto).Data.Length - 1;
+                for (var i = 0; i < IndexAttribute.TypedData.Length; ++i)
+                {
+                    var index = IndexAttribute.TypedData[i];
+
+                    if (index == -1)
+                        continue; // no relation.
+
+                    if (index < -1 || index > maxIndex)
+                        throw new Exception($"Index out of range in IndexAttribute at position {i}. Expected either -1 for no relation, or a maximum of {maxIndex} but got {index}");
+                }
+            }
+
+            {
+                var maxIndex = GetAttribute(InstanceParentAttribute.IndexInto).Data.Length - 1;
+                for (var i = 0; i < InstanceParentAttribute.TypedData.Length; ++i)
+                {
+                    var index = InstanceParentAttribute.TypedData[i];
+
+                    if (index == -1)
+                        continue; // no relation.
+
+                    if (index < -1 || index > maxIndex)
+                        throw new Exception($"Index out of range in InstanceParentAttribute at position {i}. Expected either -1 for no relation, or a maximum of {maxIndex} but got {index}");
+                }
+            }
+
+            {
+                var maxIndex = GetAttribute(InstanceMeshAttribute.IndexInto).Data.Length - 1;
+                for (var i = 0; i < InstanceMeshAttribute.TypedData.Length; ++i)
+                {
+                    var index = InstanceMeshAttribute.TypedData[i];
+
+                    if (index == -1)
+                        continue; // no relation.
+
+                    if (index < -1 || index > maxIndex)
+                        throw new Exception($"Index out of range in InstanceMeshAttribute at position {i}. Expected either -1 for no relation, or a maximum of {maxIndex} but got {index}");
+                }
+            }
+
+            {
+                var maxIndex = GetAttribute(MeshSubmeshOffsetAttribute.IndexInto).Data.Length - 1;
+                for (var i = 0; i < MeshSubmeshOffsetAttribute.TypedData.Length; ++i)
+                {
+                    var index = MeshSubmeshOffsetAttribute.TypedData[i];
+
+                    if (index == -1)
+                        continue; // no relation.
+
+                    if (index < -1 || index > maxIndex)
+                        throw new Exception($"Index out of range in MeshSubmeshOffsetAttribute at position {i}. Expected either -1 for no relation, or a maximum of {maxIndex} but got {index}");
+                }
+            }
+
+            {
+                var maxIndex = GetAttribute(SubmeshIndexOffsetAttribute.IndexInto).Data.Length - 1;
+                for (var i = 0; i < SubmeshIndexOffsetAttribute.TypedData.Length; ++i)
+                {
+                    var index = SubmeshIndexOffsetAttribute.TypedData[i];
+
+                    if (index == -1)
+                        continue; // no relation.
+
+                    if (index < -1 || index > maxIndex)
+                        throw new Exception($"Index out of range in SubmeshIndexOffsetAttribute at position {i}. Expected either -1 for no relation, or a maximum of {maxIndex} but got {index}");
+                }
+            }
+
+            {
+                var maxIndex = GetAttribute(SubmeshMaterialAttribute.IndexInto).Data.Length - 1;
+                for (var i = 0; i < SubmeshMaterialAttribute.TypedData.Length; ++i)
+                {
+                    var index = SubmeshMaterialAttribute.TypedData[i];
+
+                    if (index == -1)
+                        continue; // no relation.
+
+                    if (index < -1 || index > maxIndex)
+                        throw new Exception($"Index out of range in SubmeshMaterialAttribute at position {i}. Expected either -1 for no relation, or a maximum of {maxIndex} but got {index}");
+                }
+            }
+
+            {
+                var maxIndex = GetAttribute(ShapeVertexOffsetAttribute.IndexInto).Data.Length - 1;
+                for (var i = 0; i < ShapeVertexOffsetAttribute.TypedData.Length; ++i)
+                {
+                    var index = ShapeVertexOffsetAttribute.TypedData[i];
+
+                    if (index == -1)
+                        continue; // no relation.
+
+                    if (index < -1 || index > maxIndex)
+                        throw new Exception($"Index out of range in ShapeVertexOffsetAttribute at position {i}. Expected either -1 for no relation, or a maximum of {maxIndex} but got {index}");
+                }
+            }
+        }
+    }
+
+}
