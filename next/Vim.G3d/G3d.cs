@@ -158,7 +158,7 @@ namespace Vim.G3d
         }
 
         /// <summary>
-        /// Writes teh G3d to the given file path.
+        /// Writes the G3d to the given file path.
         /// </summary>
         public void Write(string filePath)
         {
