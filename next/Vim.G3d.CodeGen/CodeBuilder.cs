@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
 
-namespace Vim.G3d.CodeGen2
+namespace Vim.G3d.CodeGen
 {
     public class CodeBuilder
     {

@@ -13,7 +13,7 @@
   <ItemGroup Label="Code Generation">
     <!--<ProjectReference Include="..\Vim.G3d.CodeGen\Vim.G3d.CodeGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />-->
     <ProjectReference Include="..\Vim.G3d\Vim.G3d.csproj" />
-    <ProjectReference Include="..\Vim.G3d.CodeGen2\Vim.G3d.CodeGen2.csproj" >
+    <ProjectReference Include="..\Vim.G3d.CodeGen\Vim.G3d.CodeGen.csproj" >
        <!--
        NOTE: We are referencing the codegen project for build sequencing but we do not want any of its build artifacts
        See: https://github.com/dotnet/msbuild/issues/8099#issuecomment-1355501771

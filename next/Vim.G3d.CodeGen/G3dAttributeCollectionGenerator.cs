@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vim.G3d.CodeGen2
+namespace Vim.G3d.CodeGen
 {
     public static class G3dAttributeCollectionGenerator
     {

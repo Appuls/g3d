@@ -6,7 +6,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <ApplicationIcon />
         <OutputType>Exe</OutputType>
-        <StartupObject>Vim.G3d.CodeGen2.Program</StartupObject>
+        <StartupObject>Vim.G3d.CodeGen.Program</StartupObject>
         <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     </PropertyGroup>
 
@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Exec Command="dotnet &quot;$(OutDir)Vim.G3d.CodeGen2.dll&quot; &quot;../Vim.G3d.Attributes/Attributes.g.cs&quot;" />
+        <Exec Command="dotnet &quot;$(OutDir)Vim.G3d.CodeGen.dll&quot; &quot;../Vim.G3d.Attributes/Attributes.g.cs&quot;" />
     </Target>
 
 </Project>

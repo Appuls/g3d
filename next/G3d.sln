@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vim.G3d.Attributes", "Vim.G
 		{48EC226C-4F2E-4AE7-A4D7-71278A213336} = {48EC226C-4F2E-4AE7-A4D7-71278A213336}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vim.G3d.CodeGen2", "Vim.G3d.CodeGen2\Vim.G3d.CodeGen2.csproj", "{48EC226C-4F2E-4AE7-A4D7-71278A213336}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vim.G3d.CodeGen", "Vim.G3d.CodeGen\Vim.G3d.CodeGen.csproj", "{48EC226C-4F2E-4AE7-A4D7-71278A213336}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,5 +1,5 @@
 ﻿
-namespace Vim.G3d.CodeGen2
+namespace Vim.G3d.CodeGen
 {
     public static class Program
     {
